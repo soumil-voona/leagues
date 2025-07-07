@@ -1,5 +1,5 @@
 import '../styles/App.css';
-import LoginForm from '../components/LoginForm';
+import LoginForm from '../components/SignUp';
 import Title from '../components/Title';
 import { useNavigate } from 'react-router-dom';
 
