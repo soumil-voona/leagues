@@ -1,0 +1,16 @@
+.menu {
+    background-color: antiquewhite;
+    padding-top: 15px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 80vw;
+    height: 100vh;
+    z-index: 1;
+}
+
+.menu-items {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}

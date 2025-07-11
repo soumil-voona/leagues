@@ -1,9 +1,6 @@
 // For changing screen
 import { useNavigate } from 'react-router-dom';
 
-// For the submit button
-import Button from '@mui/material/Button';
-
 export default function ChangeURLButton(props) {
 
     const navigate = useNavigate();
@@ -16,6 +13,6 @@ export default function ChangeURLButton(props) {
     }
     
     return (
-        <Button onClick={handleClick}>{props.content}</Button>
+        <div onClick={handleClick}>{props.children}</div>
     );
 }

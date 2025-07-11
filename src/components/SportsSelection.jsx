@@ -13,6 +13,7 @@ import '../styles/sportsButton.css';
 
 // For the submit button
 import ChangeURLButton from './ChangeURLButton';
+import Button from '@mui/material/Button';
 
 export default function SportsSelection() {
   
@@ -65,7 +66,9 @@ export default function SportsSelection() {
         {/* Add more ToggleButtons for other sports/icons */}
       </ToggleButtonGroup>
 
-      <ChangeURLButton onClick={handleClick} content="Continue" location="/homepage"/>
+      <ChangeURLButton onClick={handleClick} location="/homepage">
+        <Button>Continue</Button>
+      </ChangeURLButton>
     </div>
   );
 }
