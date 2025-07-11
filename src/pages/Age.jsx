@@ -13,6 +13,8 @@ export default function Age() {
             <AgeSelection />
             {/* Sport Selection */}
             <SportsSelection />
+
+
         </div>
     );
 }

@@ -1,0 +1,12 @@
+.header {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    margin: 10px 25px 0px 25px;
+}
+
+.user-avatar {
+    margin-left: auto;
+}
+
