@@ -1,15 +1,15 @@
 import "../styles/App.css";
-import LoginForm from "../components/LoginComponent";
+import SignUpForm from "../components/SignupComponent";
 import Title from "../components/Title";
 import { useNavigate } from "react-router-dom";
 import { AuthProvider } from "../hooks/useAuth.jsx";
 import { TopWave, BottomWave } from "../components/LandingWaves";
 
-export default function Login() {
+export default function Signup() {
   const navigate = useNavigate();
 
-  function handleSignupClick() {
-    navigate("/signup");
+  function handleLoginClick() {
+    navigate("/login");
   }
 
   return (
@@ -25,21 +25,21 @@ export default function Login() {
           >
             <Title />
           </div>
-          <LoginForm />
+          <SignUpForm />
           <p className="extra-text">
             <span style={{ font: "400 20px Poppins, sans-serif" }}>
-              don't have an account?
+              already have an account?
             </span>{" "}
             <span
               className="link-highlight"
-              onClick={handleSignupClick}
+              onClick={handleLoginClick}
               style={{
                 fontWeight: "300",
                 fontSize: "20px",
                 paddingLeft: "10px",
               }}
             >
-              sign up
+              log in
             </span>
           </p>
         </div>

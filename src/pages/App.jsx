@@ -1,21 +1,28 @@
-import '../styles/App.css';
-import { useNavigate } from 'react-router-dom';
-import Title from '../components/Title';
+import "../styles/App.css";
+import { useNavigate } from "react-router-dom";
+import Title from "../components/Title";
+import { TopWave, BottomWave } from "../components/LandingWaves";
 
 function App() {
   const navigate = useNavigate();
 
   const handleStart = () => {
-    navigate('/login'); // Navigates to the /login route
+    navigate("/login");
   };
 
   return (
-    <div className="vertical">
-      <Title />
-      <p className='extra-text'>The home of friendly matchmaking.</p>
-      <button className="button" onClick={handleStart}>Let's Play!</button>
+    <div className="landing-page">
+      <TopWave />
+      <div className="main-content">
+        <Title />
+        <p className="tagline">the home of friendly match-making</p>
+        <button className="cta-button" onClick={handleStart}>
+          LET'S PLAY
+        </button>
+      </div>
+      <BottomWave />
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

@@ -1,66 +1,202 @@
+:root {
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
 * {
-    margin: 0;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-.vertical {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+html,
+body {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+  position: fixed;
+  inset: 0;
 }
 
-.centered-vertical {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+/* Landing Page */
+.landing-page {
+  height: 100dvh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+  padding-bottom: var(--safe-bottom);
 }
 
+/* Waves */
+.top-wave,
+.bottom-wave {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.top-wave {
+  top: 0;
+  height: 15dvh; /* reduced from 30dvh */
+}
+
+.bottom-wave {
+  bottom: 0;
+  height: 15dvh; /* reduced from 30dvh */
+  padding-bottom: var(--safe-bottom);
+}
+
+/* Main content */
+.main-content {
+  flex: 1;
+  z-index: 2;
+  position: relative;
+  padding: 20px;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  text-align: center;
+}
+
+/* Title and tagline */
 .main-heading {
-    font-size: 80px;
-    margin: 0;
+  font-size: clamp(60px, 15vw, 120px);
+  font-weight: 900;
+  color: #000;
+  letter-spacing: -2px;
+  text-transform: uppercase;
+  font-family: Impact, "Arial Black", sans-serif;
+  line-height: 0.9;
 }
 
-.button {
-    padding: 0 10px;
-    margin: 30px;
-    border-radius: 24px;
-    color: white;
-    background-color: black;
+.title-image {
+  max-width: min(90vw, 500px);
+  width: 100%;
+  height: auto;
+  margin: 0 auto 10px auto;
+  object-fit: contain;
+  display: block;
+}
+
+/* Title styling for auth pages */
+.auth-page .title-image {
+  max-width: 332px;
+  width: 100%;
+  margin: 0 auto;
+  padding-top: 1px;
+}
+
+.tagline {
+  font-size: clamp(16px, 3.5vw, 24px);
+  color: #000;
+  margin: 20px 0 40px;
+  font-weight: 200;
+  max-width: 600px;
+  font-family: "Poppins", sans-serif;
+  padding: 0 20px;
+}
+
+/* CTA Button */
+.cta-button {
+  background-color: #000;
+  color: white;
+  border: none;
+  border-radius: 15px;
+  padding: 20px 40px;
+  font-size: clamp(18px, 4vw, 28px);
+  font-weight: bold;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  max-width: 400px;
+  width: clamp(280px, 65vw, 400px);
+  font-family: "Russo One", sans-serif;
+}
+
+.cta-button:hover {
+  background-color: #333;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.cta-button:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+  .top-wave {
+    height: 80px;
+  }
+
+  .bottom-wave {
+    height: 100px;
+  }
+
+  .main-content {
+    padding: 40px 20px;
+  }
+
+  .tagline {
+    font-size: clamp(14px, 4vw, 20px);
+    margin: 15px 0 30px;
+  }
+
+  .cta-button {
+    padding: 15px 30px;
+    width: clamp(250px, 60vw, 350px);
+    font-size: clamp(16px, 3.5vw, 24px);
+  }
+}
+
+@media (max-width: 480px) {
+  .top-wave {
+    height: 120px;
+  }
+
+  .bottom-wave {
+    height: 150px;
+  }
+
+  .main-content {
+    padding: 30px 15px;
+  }
+
+  .tagline {
+    font-size: clamp(12px, 4.5vw, 18px);
+    margin: 10px 0 25px;
+  }
+
+  .cta-button {
+    padding: 12px 25px;
+    width: clamp(200px, 70vw, 280px);
+    font-size: clamp(14px, 4vw, 20px);
+  }
+}
+
+@media (min-width: 1200px) {
+  .title-image {
+    max-width: 600px;
+  }
+
+  .tagline {
+    font-size: 26px;
+    max-width: 700px;
+  }
+
+  .cta-button {
     font-size: 30px;
-}
-
-.login-form {
-    margin-top: 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-#login-button {
-    padding: 0 10px;
-    margin-top: 0;
-}
-
-input {
-    width: 225px;
-    height: 15px;
-    font-size: 20px;
-    padding: 8px;
-    margin-bottom: 10px;
-    border: 4px solid black;
-}
-
-.sports-icon {
-    height: 30px;
-    width: 30px;
-}
-
-#sports-icon-div {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-evenly;
-    height: 30px;
-    width: 300px;
+    padding: 25px 50px;
+    max-width: 450px;
+  }
 }
