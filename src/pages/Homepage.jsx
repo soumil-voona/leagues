@@ -30,7 +30,7 @@ export default function Homepage() {
         const userDoc = await getDoc(doc(db, "users", user.uid));
         if (userDoc.exists()) {
           const userData = userDoc.data();
-          setUserName(userData.username || user.displayName || "User Name");
+          setUserName(userData.name);
         }
       } catch (error) {
         console.error("Error fetching user data:", error);

@@ -1,37 +1,87 @@
 .sports-toggle-group {
-  display: flex;
-  flex-wrap: wrap;
+  display: flex !important;
+  flex-wrap: nowrap !important;
   gap: 12px;
   justify-content: center;
+  margin: 10px auto;
+  width: 100%;
 }
 
 .MuiToggleButton-root {
-  border: 1px solid #ccc !important;
+  border: 2px solid #000 !important;
   border-radius: 8px !important;
-  padding: 12px 24px !important;
-  color: #666 !important;
+  padding: 6px 4px !important;
+  color: #000 !important;
   display: flex !important;
   flex-direction: column !important;
-  gap: 8px !important;
-  min-width: 120px !important;
+  gap: 2px !important;
+  flex: 1 !important;
+  max-width: calc((100% - 48px) / 5) !important;
+  /* 48px is total gap (12px * 4 gaps) */
+  min-width: 0 !important;
+  background-color: #fff !important;
+  aspect-ratio: 1 !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
 }
 
 .MuiToggleButton-root.Mui-selected {
-  background-color: #2cbb34 !important;
+  background-color: #000 !important;
   color: white !important;
-  border-color: #2cbb34 !important;
+  border-color: #000 !important;
 }
 
 .MuiToggleButton-root:hover {
-  background-color: rgba(44, 187, 52, 0.1) !important;
+  background-color: rgba(0, 0, 0, 0.1) !important;
 }
 
 .MuiToggleButton-root.Mui-selected:hover {
-  background-color: #25a02c !important;
+  background-color: #000 !important;
 }
 
 .sport-label {
-  font-size: 14px;
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(.4rem, .9vw, 1.7vw);
   font-weight: 500;
-  margin-top: 4px;
+  margin-top: 2px;
+  white-space: normal;
+  width: 100%;
+  text-align: center;
+  padding: 0 2px;
+  box-sizing: border-box;
+  line-height: 1;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  max-height: 2em;
+}
+
+.MuiToggleButton-root svg {
+  font-size: 20px;
+}
+
+.MuiToggleButton-root img {
+  width: 20px;
+  height: 20px;
+}
+
+.continue-button {
+  background-color: #2CBB34 !important;
+  color: white !important;
+  font-family: 'Poppins', sans-serif !important;
+  font-size: 1rem !important;
+  padding: 8px 32px !important;
+  border-radius: 8px !important;
+  text-transform: none !important;
+  margin-top: 30px !important;
+}
+
+.continue-button:hover {
+  background-color: #25a02c !important;
+}
+
+.continue-button:disabled {
+  background-color: #ccc !important;
 }
