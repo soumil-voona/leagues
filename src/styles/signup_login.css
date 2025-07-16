@@ -1,26 +1,44 @@
-/* Signup Page Responsive Styles */
+/* Signup/Login Form Base Styles */
+:root {
+  --primary-color: #2CBB34;
+  --text-color: #333;
+  --border-color: #e0e0e0;
+  --error-color: #d32f2f;
+  --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --transition: all 0.3s ease;
+}
+
 .login-form {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: 1.5rem;
   width: 100%;
   max-width: 400px;
-  margin: 0 auto;
-  padding: 0 24px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: var(--box-shadow);
 }
 
 .login-form input {
   width: 100%;
-  padding: 16px;
-  border: 2px solid #000;
+  padding: 1rem 1.25rem;
+  border: 2px solid var(--border-color);
   border-radius: 8px;
-  font-family: Poppins, sans-serif;
-  font-style: italic;
-  font-size: 16px;
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--text-color);
   outline: none;
-  transition: border-color 0.2s;
-  background: white;
+  transition: var(--transition);
+  background: #f8f9fa;
+}
+
+.login-form input:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(44, 187, 52, 0.1);
 }
 
 .login-form input::placeholder {
@@ -31,18 +49,28 @@
 
 .button {
   width: 100%;
-  padding: 16px;
+  padding: 1rem;
   border: none;
   border-radius: 8px;
-  background-color: #000;
+  background-color: var(--primary-color);
   color: white;
-  font-family: Poppins, sans-serif;
-  font-size: 18px;
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 1rem;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
   cursor: pointer;
-  transition: transform 0.2s;
+  transition: var(--transition);
+  text-transform: none;
+  margin-top: 0.5rem;
+}
+
+.button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(44, 187, 52, 0.2);
+}
+
+.button:active:not(:disabled) {
+  transform: translateY(0);
 }
 
 .button:hover:not(:disabled) {
@@ -56,21 +84,32 @@
 
 .google-btn {
   width: 100%;
-  padding: 16px;
-  border: 2px solid #000;
+  padding: 0.875rem 1.25rem;
+  border: 2px solid var(--border-color);
   border-radius: 8px;
   background-color: white;
-  color: #000;
-  font-family: Poppins, sans-serif;
-  font-size: 16px;
+  color: var(--text-color);
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 0.9375rem;
   font-weight: 500;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  transition: background-color 0.2s;
-  text-transform: lowercase;
+  gap: 0.75rem;
+  transition: var(--transition);
+  margin: 0.5rem 0;
+}
+
+.google-btn:hover {
+  background-color: #f5f5f5;
+  border-color: #d0d0d0;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.google-btn:active {
+  transform: translateY(0);
 }
 
 .google-btn:hover:not(:disabled) {
@@ -83,19 +122,104 @@
 }
 
 .error-message {
-  color: #d32f2f;
-  font-size: 14px;
-  font-family: Poppins, sans-serif;
-  margin-top: 8px;
-  text-align: center;
+  color: var(--error-color);
+  font-size: 0.875rem;
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  margin: 0.5rem 0 0;
+  padding: 0.5rem;
+  background-color: rgba(211, 47, 47, 0.08);
+  border-radius: 6px;
+  text-align: left;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-.extra-text {
-  color: #666;
-  font-size: 24px;
+/* Typography */
+.subtitle-text {
+  color: var(--text-color);
+  font-size: 1.5rem;
   font-weight: 600;
-  margin: 0;
+  margin: 0 0 1.5rem 0;
   text-align: center;
+  line-height: 1.3;
+}
+
+.divider-text {
+  color: #6c757d;
+  font-size: 0.875rem;
+  text-align: center;
+  position: relative;
+  margin: 1rem 0;
+}
+
+.divider-text::before,
+.divider-text::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 45%;
+  height: 1px;
+  background-color: var(--border-color);
+}
+
+.divider-text::before {
+  left: 0;
+}
+
+.divider-text::after {
+  right: 0;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 480px) {
+  .login-form {
+    padding: 1.5rem;
+    margin: 1rem auto;
+    border-radius: 8px;
+    box-shadow: none;
+  }
+  
+  .subtitle-text {
+    font-size: 1.25rem;
+    margin-bottom: 1.25rem;
+  }
+  
+  .button, .google-btn {
+    padding: 0.875rem;
+  }
+}
+
+/* Accessibility Improvements */
+button:focus-visible,
+input:focus-visible {
+  outline: 3px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+/* Loading State */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.button:disabled,
+.google-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  position: relative;
+}
+
+.button:disabled::after,
+.google-btn:disabled::after {
+  content: '';
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 0.8s linear infinite;
+  margin-left: 0.5rem;
+  vertical-align: middle;
 }
 
 .link-highlight {
