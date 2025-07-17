@@ -1,0 +1,147 @@
+
+/* Teams Page Layout */
+.teams-page {
+    padding: 32px;
+    max-width: 1600px;
+    margin: 0 auto;
+    min-height: 100vh;
+    background: #f8f9fa;
+}
+
+.teams-container {
+    padding: 20px 0;
+    width: 100%;
+}
+
+.teams-container h2 {
+    font-family: 'Russo One', sans-serif;
+    font-size: 2rem;
+    color: #1a237e;
+    margin-bottom: 40px;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.teams-grid {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 32px;
+    padding: 0 16px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1400px) {
+    .teams-grid {
+        gap: 24px;
+    }
+}
+
+@media (max-width: 768px) {
+    .teams-page {
+        padding: 16px;
+    }
+
+    .teams-container h2 {
+        font-size: 1.5rem;
+        margin-bottom: 24px;
+    }
+
+    .teams-grid {
+        flex-direction: column;
+        align-items: center;
+        gap: 24px;
+    }
+}
+
+/* Animation for team cards */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.team-container {
+    animation: fadeInUp 0.3s ease-out;
+    flex: 0 0 auto;
+}
+
+/* Team Component Styles */
+.team-container {
+    background-color: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08), 
+                0 3px 6px rgba(0, 0, 0, 0.05);
+    padding: 24px;
+    margin: 15px auto;
+    max-width: 320px;
+    width: 90%;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.team-container:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 
+                0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.team-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eaeaea;
+}
+
+.sport-icon {
+    width: 40px;
+    height: 40px;
+    background-color: #f5f5f5;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+}
+
+.team-name {
+    font-family: 'Russo One', sans-serif;
+    font-size: 1.2rem;
+    color: #333333;
+    margin: 0;
+    text-transform: uppercase;
+    text-align: left;
+}
+
+.team-details {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.detail-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+}
+
+.detail-label {
+    color: #666666;
+    font-weight: 500;
+}
+
+.detail-value {
+    color: #333333;
+    font-weight: 600;
+}

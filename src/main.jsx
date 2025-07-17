@@ -3,6 +3,9 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { createRoot } from 'react-dom/client';
 import { AuthProvider } from './hooks/useAuth.jsx';
 
+// Initialize Firebase
+import './firebaseConfig';
+
 // Pages Imports
 import App from './pages/App';
 import Login from './pages/Login';

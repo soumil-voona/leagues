@@ -1,209 +1,124 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
-import { app } from '../firebaseConfig';
-import { useAuth } from '../hooks/useAuth';
-
-// Initialize Firestore
-const db = getFirestore(app);
-import { 
-  FaFutbol as SoccerIcon,
-  FaBasketballBall as BasketballIcon,
-  FaTableTennis as TennisIcon,
-  FaVolleyballBall as VolleyballIcon,
-  FaBaseballBall as BaseballIcon,
-  FaFootballBall as FootballIcon
-} from 'react-icons/fa';
-import '../styles/age.css';
-
-const sports = [
-  { id: 'soccer', name: 'Soccer', icon: SoccerIcon },
-  { id: 'basketball', name: 'Basketball', icon: BasketballIcon },
-  { id: 'tennis', name: 'Tennis', icon: TennisIcon },
-  { id: 'volleyball', name: 'Volleyball', icon: VolleyballIcon },
-  { id: 'baseball', name: 'Baseball', icon: BaseballIcon },
-  { id: 'football', name: 'Football', icon: FootballIcon },
-];
+import AgeSelection from "../components/AgeSelection";
+import SportsSelection from "../components/SportsSelection";
+import { useAuth } from "../hooks/useAuth";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { getFirestore, doc, getDoc } from "firebase/firestore";
+import { app } from "../firebaseConfig";
+import { TopWave, BottomWave } from "../components/LandingWaves";
+import TextField from '@mui/material/TextField';
+import "../styles/age.css";
 
 export default function Age() {
-  const { user } = useAuth();
-  const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
-  const [inputValue, setInputValue] = useState('18');
-  const [selectedAge, setSelectedAge] = useState(18);
-  const [name, setName] = useState('');
-  const [selectedSports, setSelectedSports] = useState([]);
-  const db = getFirestore(app);
+    const { user } = useAuth();
+    const navigate = useNavigate();
+    const [loading, setLoading] = useState(true);
+    const [selectedAge, setSelectedAge] = useState(18);
+    const [name, setName] = useState("");
+    const db = getFirestore(app);
 
-  useEffect(() => {
-    if (user === undefined) return; // Still initializing
-    if (!user) {
-      navigate('/login');
-      return;
-    }
-
-    const checkUserProfile = async () => {
-      try {
-        const userDoc = await getDoc(doc(db, 'users', user.uid));
-        if (userDoc.exists()) {
-          const userData = userDoc.data();
-          if (userData.name && userData.age && userData.sports?.length) {
-            navigate('/homepage');
-          }
+    useEffect(() => {
+        if (user === undefined) {
+            return; // Still initializing
         }
-      } catch (error) {
-        console.error('Error checking user profile:', error);
-      } finally {
-        setLoading(false);
-      }
+
+        if (!user) {
+            navigate("/login");
+            return;
+        }
+
+        const checkUserProfile = async () => {
+            try {
+                const userDoc = await getDoc(doc(db, "users", user.uid));
+                if (userDoc.exists()) {
+                    const userData = userDoc.data();
+                    // If user already has name, age and sports, redirect to homepage
+                    if (userData.name && userData.age && userData.sports && userData.sports.length > 0) {
+                        navigate("/homepage");
+                    }
+                }
+            } catch (error) {
+                console.error("Error checking user profile:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        checkUserProfile();
+    }, [user, navigate, db]);
+
+    const handleAgeChange = (age) => {
+        setSelectedAge(age);
     };
 
-    checkUserProfile();
-  }, [user, navigate, db]);
+    const handleNameChange = (event) => {
+        setName(event.target.value);
+    };
 
-  const handleAgeChange = (newAge) => {
-    setSelectedAge(newAge);
-    setInputValue(newAge === 0 ? '' : newAge.toString());
-  };
+    if (loading || user === undefined) {
+        return <div style={{textAlign: 'center', marginTop: '20vh'}}>Loading...</div>;
+    }
 
-  const handleInputChange = (e) => {
-    const value = e.target.value.replace(/\D/g, '').slice(0, 2);
-    setInputValue(value);
+    if (!user) {
+        return null;
+    }
     
-    if (value === '') {
-      setSelectedAge(0);
-    } else {
-      const numValue = parseInt(value, 10);
-      if (!isNaN(numValue) && numValue >= 0 && numValue <= 99) {
-        setSelectedAge(numValue);
-      }
-    }
-  };
-
-  const handleNameChange = (event) => {
-    setName(event.target.value);
-  };
-
-  const toggleSport = (sportId) => {
-    setSelectedSports(prev => {
-      if (prev.includes(sportId)) {
-        return prev.filter(id => id !== sportId);
-      } else {
-        return [...prev, sportId];
-      }
-    });
-  };
-
-  const handleContinue = async () => {
-    if (name.trim() && selectedSports.length > 0) {
-      try {
-        // Save to Firestore
-        const userRef = doc(db, 'users', user.uid);
-        await setDoc(userRef, {
-          name: name.trim(),
-          age: selectedAge,
-          sports: selectedSports,
-          updatedAt: serverTimestamp()
-        }, { merge: true });
-        
-        // Navigate to home page
-        navigate('/homepage');
-      } catch (error) {
-        console.error('Error saving user data:', error);
-        // Optionally show an error message to the user
-        alert('Failed to save your information. Please try again.');
-      }
-    }
-  };
-
-  if (loading || user === undefined) {
-    return <div className="loading">Loading...</div>;
-  }
-
-  if (!user) return null;
-
-  return (
-    <div className="age-page">
-      <div className="welcome-section">
-        <h1>Welcome to Leagues</h1>
-        <p>Let's set up your profile</p>
-      </div>
-
-      <div className="form-container">
-        <div className="form-group">
-          <label htmlFor="name">Enter Name</label>
-          <input
-            type="text"
-            id="name"
-            value={name}
-            onChange={handleNameChange}
-            placeholder="Your Name"
-            className="name-input"
-          />
-        </div>
-
-        <div className="form-group">
-          <label>Select Age</label>
-          <div className="age-input-container">
-            <input
-              type="number"
-              min="0"
-              max="99"
-              value={inputValue}
-              maxLength="2"
-              onFocus={() => setInputValue('')}
-              onBlur={() => {
-                if (inputValue === '') {
-                  setSelectedAge(0);
-                }
-              }}
-              onChange={handleInputChange}
-              className="age-number-input"
-              aria-label="Enter your age"
-            />
-            {selectedAge > 0 && <span className="age-plus">+</span>}
-          </div>
-          <input
-            type="range"
-            min="0"
-            max="99"
-            value={selectedAge}
-            onChange={(e) => handleAgeChange(parseInt(e.target.value, 10))}
-            className="age-slider"
-          />
-          <div className="age-labels">
-            <span>0</span>
-            <span>99+</span>
-          </div>
-        </div>
-
-        <div className="form-group">
-          <label>Sports</label>
-          <div className="sports-buttons">
-            {sports.map(sport => (
-              <button
-                key={sport.id}
-                className={`sport-button ${selectedSports.includes(sport.id) ? 'selected' : ''}`}
-                onClick={() => toggleSport(sport.id)}
-                type="button"
-              >
-                <div className="sport-icon">
-                  <sport.icon className="sport-svg" />
+    return (
+        <div className="age-page">
+            
+            <div className="age-content">
+                <img src="/imgs/title-text.png" alt="LEAGUES" className="title-image" />
+                
+                <h2 className="select-age-text">Enter Name</h2>
+                <div className="name-input-container">
+                    <TextField
+                        fullWidth
+                        label="Your Name"
+                        variant="outlined"
+                        value={name}
+                        onChange={handleNameChange}
+                        sx={{
+                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                            borderRadius: '8px',
+                            '& .MuiOutlinedInput-root': {
+                                '& fieldset': {
+                                    borderColor: '#2CBB34',
+                                    borderWidth: '2px',
+                                },
+                                '&:hover fieldset': {
+                                    borderColor: '#2CBB34',
+                                },
+                                '&.Mui-focused fieldset': {
+                                    borderColor: '#2CBB34',
+                                },
+                            },
+                            '& .MuiInputLabel-root': {
+                                color: '#2CBB34',
+                                fontFamily: 'Poppins, sans-serif',
+                                '&.Mui-focused': {
+                                    color: '#2CBB34',
+                                },
+                            },
+                            '& .MuiInputBase-input': {
+                                fontFamily: 'Poppins, sans-serif',
+                                fontSize: '1.1rem',
+                                padding: '14px',
+                            },
+                            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                        }}
+                    />
                 </div>
-                <span>{sport.name}</span>
-              </button>
-            ))}
-          </div>
+                
+                <h2 className="select-age-text">Select Age</h2>
+                <div className="selection-container">
+                    <AgeSelection onAgeChange={handleAgeChange} />
+                </div>
+                
+                <h2 className="sports-text">Select Sports</h2>
+                <div className="selection-container">
+                    <SportsSelection selectedAge={selectedAge} name={name} />
+                </div>
+            </div>
         </div>
-      </div>
-
-      <button 
-        className="continue-button"
-        onClick={handleContinue}
-        disabled={!name || selectedSports.length === 0}
-      >
-        Continue
-      </button>
-    </div>
-  );
+    );
 }
