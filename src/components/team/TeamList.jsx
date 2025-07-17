@@ -60,9 +60,21 @@ export default function TeamList() {
     }
 
     return (
-        <Grid container spacing={3}>
+        <Grid 
+            container 
+            spacing={3} 
+            justifyContent="center"
+            sx={{
+                width: '100%',
+                margin: '0 auto',
+                '& .MuiGrid-item': {
+                    display: 'flex',
+                    justifyContent: 'center'
+                }
+            }}
+        >
             {teams.map(team => (
-                <Grid item xs={12} sm={6} md={4} key={team.id}>
+                <Grid item xs={12} sm={6} md={4} lg={4} key={team.id}>
                     <Team team={team} />
                 </Grid>
             ))}

@@ -17,13 +17,41 @@ body {
 .age-page {
   min-height: 100vh;
   background-color: #f8f9fa;
-  padding: 20px;
+  padding: 40px 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
   max-width: 500px;
   margin: 0 auto;
+}
+
+.age-content {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  padding: 20px;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.title-image {
+  max-width: 200px;
+  height: auto;
+  margin-bottom: 16px;
+  transition: max-width 0.3s ease;
+}
+
+.welcome-text {
+  font-size: 24px;
+  font-weight: 600;
+  color: #2CBB34;
+  text-align: center;
+  margin: 0;
+  padding: 0;
 }
 
 .welcome-section {
@@ -277,8 +305,16 @@ body {
 
 @media (min-width: 768px) {
   .age-page {
-    padding: 40px 20px;
-    justify-content: center;
+    padding: 60px 40px;
+  }
+
+  .age-content {
+    padding: 40px;
+    gap: 40px;
+  }
+
+  .selection-container {
+    padding: 24px;
   }
   
   .welcome-section h1 {
@@ -327,4 +363,145 @@ body {
   margin: 20px 0 10px;
   color: black;
   text-transform: uppercase;
+}
+
+/* Tablet Breakpoint */
+@media (min-width: 768px) {
+  .age-page {
+    padding: 60px 40px;
+    max-width: 700px;
+  }
+
+  .age-content {
+    padding: 40px;
+    gap: 40px;
+  }
+
+  .title-image {
+    max-width: 250px;
+  }
+
+  .welcome-text {
+    font-size: 28px;
+  }
+
+  .select-age-text, .sports-text {
+    font-size: 24px;
+  }
+
+  .selection-container {
+    padding: 24px;
+    margin-top: -20px;
+  }
+
+  .sports-buttons {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+
+  .sport-button {
+    padding: 20px 10px;
+    min-height: 120px;
+  }
+
+  .sport-icon {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 12px;
+  }
+
+  .sport-button span {
+    font-size: 14px;
+  }
+}
+
+/* Desktop Breakpoint */
+@media (min-width: 1024px) {
+  .age-page {
+    padding: 80px 40px;
+    max-width: 900px;
+  }
+
+  .age-content {
+    padding: 60px;
+    gap: 48px;
+    border-radius: 30px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .title-image {
+    max-width: 300px;
+    margin-bottom: 24px;
+  }
+
+  .welcome-text {
+    font-size: 32px;
+  }
+
+  .select-age-text, .sports-text {
+    font-size: 28px;
+  }
+
+  .selection-container {
+    padding: 32px;
+    margin-top: -24px;
+    border-radius: 20px;
+  }
+
+  .sports-buttons {
+    grid-template-columns: repeat(5, 1fr);
+    gap: 20px;
+  }
+
+  .sport-button {
+    padding: 24px 12px;
+    min-height: 140px;
+    border-radius: 16px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .sport-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .sport-icon {
+    width: 56px;
+    height: 56px;
+    margin-bottom: 16px;
+  }
+
+  .sport-svg {
+    width: 40px;
+    height: 40px;
+  }
+
+  .sport-button span {
+    font-size: 16px;
+    font-weight: 500;
+  }
+
+  /* Age slider improvements for desktop */
+  .age-slider {
+    height: 8px;
+  }
+
+  .age-slider::-webkit-slider-thumb {
+    width: 28px;
+    height: 28px;
+  }
+
+  .age-slider::-moz-range-thumb {
+    width: 28px;
+    height: 28px;
+  }
+
+  .age-number-input {
+    font-size: 42px;
+  }
+
+  .age-labels {
+    font-size: 16px;
+    margin-top: 8px;
+  }
 }

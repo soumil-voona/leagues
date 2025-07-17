@@ -9,7 +9,7 @@ import Icon from './Icon';
 const styles = {
     card: {
         width: '100%',
-        maxWidth: '600px',
+        maxWidth: '400px',
         borderRadius: '16px',
         boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)',
         transition: 'transform 0.2s ease, box-shadow 0.2s ease',
@@ -19,7 +19,8 @@ const styles = {
             boxShadow: '0 12px 32px rgba(0, 0, 0, 0.15)'
         },
         background: 'linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%)',
-        border: '1px solid rgba(0, 0, 0, 0.05)'
+        border: '1px solid rgba(0, 0, 0, 0.05)',
+        margin: '0 auto'
     },
     content: {
         padding: '24px !important',
@@ -135,7 +136,6 @@ export default function Team({ team }) {
     };
 
     return (
-        <div style={{ display: 'flex', justifyContent: 'center' }}>
         <Card sx={styles.card} onClick={handleClick}>
             <CardContent sx={styles.content}>
                 <Box sx={styles.header}>
@@ -210,6 +210,5 @@ export default function Team({ team }) {
                 </Collapse>
             </CardContent>
         </Card>
-        </div>
     );
 }

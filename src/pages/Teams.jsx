@@ -3,7 +3,7 @@ import { db } from '../firebaseConfig';
 import Header from "../components/Header";
 import TeamList from "../components/team/TeamList";
 import Title from "../components/Title";
-import CreateTeamModal from "../components/CreateTeamModal";
+import CreateTeamModal from "../components/team/CreateTeamModal";
 import { Button, Box, Container, Typography } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import "../styles/teams.css";
@@ -15,7 +15,16 @@ export default function Teams() {
         <Box sx={{ minHeight: '100vh', bgcolor: '#f8f9fa' }}>
             <Header />
             <Title />
-            <Container maxWidth="lg" sx={{ py: 4 }}>
+            <Container 
+                maxWidth="lg" 
+                sx={{ 
+                    py: 4,
+                    px: { xs: 2, sm: 3, md: 4 },
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'stretch'
+                }}
+            >
                 <Box sx={{ 
                     display: 'flex', 
                     justifyContent: 'space-between', 
