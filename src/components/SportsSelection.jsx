@@ -43,7 +43,7 @@ export default function SportsSelection({ selectedAge, name }) {
       setError("Please enter your name");
       return;
     }
-    
+
     if (sports.length === 0) {
       setError("Please select at least one sport");
       return;
@@ -59,7 +59,7 @@ export default function SportsSelection({ selectedAge, name }) {
         age: selectedAge,
         sports: sports,
       });
-      navigate("/homepage");
+      navigate("/");
     } catch (err) {
       setError("Failed to save profile: " + err.message);
       console.error("Error saving profile:", err);
@@ -101,7 +101,7 @@ export default function SportsSelection({ selectedAge, name }) {
           <span className="sport-label">Volleyball</span>
         </ToggleButton>
       </ToggleButtonGroup>
-      
+
       <div style={{ textAlign: 'center' }}>
         <Button
           variant="contained"
@@ -112,8 +112,8 @@ export default function SportsSelection({ selectedAge, name }) {
           {loading ? "Saving..." : "Continue"}
         </Button>
         {error && (
-          <p style={{ 
-            color: '#ff3333', 
+          <p style={{
+            color: '#ff3333',
             marginTop: 16,
             fontFamily: 'Poppins, sans-serif',
             fontSize: '0.9rem'

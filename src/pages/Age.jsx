@@ -33,7 +33,7 @@ export default function Age() {
                     const userData = userDoc.data();
                     // If user already has age and sports, redirect to homepage
                     if (userData.age && userData.sports && userData.sports.length > 0) {
-                        navigate("/homepage");
+                        navigate("/");
                     }
                     // Set the user's name from Firestore
                     setUserName(userData.name || "");
@@ -53,27 +53,27 @@ export default function Age() {
     };
 
     if (loading || user === undefined) {
-        return <div style={{textAlign: 'center', marginTop: '20vh'}}>Loading...</div>;
+        return <div style={{ textAlign: 'center', marginTop: '20vh' }}>Loading...</div>;
     }
 
     if (!user) {
         return null;
     }
-    
+
     return (
         <div className="age-page">
             <div className="age-content">
                 <img src="/imgs/title-text.png" alt="LEAGUES" className="title-image" />
-                
+
                 {userName && (
                     <h2 className="welcome-text">Welcome, {userName.split(' ')[0]}!</h2>
                 )}
-                
+
                 <h2 className="select-age-text">Select Age</h2>
                 <div className="selection-container">
                     <AgeSelection onAgeChange={handleAgeChange} />
                 </div>
-                
+
                 <h2 className="sports-text">Select Sports</h2>
                 <div className="selection-container">
                     <SportsSelection selectedAge={selectedAge} name={userName} />

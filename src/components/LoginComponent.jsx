@@ -18,7 +18,7 @@ export default function LoginComponent() {
         setLoading(true);
         try {
             await signInWithEmailAndPassword(auth, email, password);
-            navigate("/homepage");
+            navigate("/");
         } catch (err) {
             setError(err.message);
         } finally {
@@ -32,7 +32,7 @@ export default function LoginComponent() {
         try {
             const provider = new GoogleAuthProvider();
             await signInWithPopup(auth, provider);
-            navigate("/homepage");
+            navigate("/");
         } catch (err) {
             setError(err.message);
         } finally {

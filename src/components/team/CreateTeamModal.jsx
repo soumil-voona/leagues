@@ -413,7 +413,7 @@ export default function CreateTeamModal({ open, onClose }) {
                                 <TextField
                                     label="Add Team Members"
                                     value={playersInput}
-                                    onChange={(e) => setPlayersInput(e.target.value)}
+                                    onChange={(e) => setPlayersInput(e.target.value.toLowerCase())}
                                     onKeyDown={handleAddPlayer}
                                     placeholder="Type names and press comma or enter"
                                     variant="outlined"

@@ -85,7 +85,7 @@ export default function SignUpForm() {
         type="text"
         placeholder="First Name"
         value={firstName}
-        onChange={e => setFirstName(e.target.value)}
+        onChange={e => setFirstName(e.target.value.toLowerCase())}
         required
         autoFocus
       />
@@ -94,7 +94,7 @@ export default function SignUpForm() {
         type="text"
         placeholder="Last Name"
         value={lastName}
-        onChange={e => setLastName(e.target.value)}
+        onChange={e => setLastName(e.target.value.toLowerCase())}
         required
       />
       <input

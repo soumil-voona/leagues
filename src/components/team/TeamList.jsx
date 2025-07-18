@@ -1,55 +1,9 @@
-import { useState, useEffect } from 'react';
-import { collection, query, getDocs } from 'firebase/firestore';
-import { db } from '../../firebaseConfig';
-import { useAuth } from '../../hooks/useAuth';
+import { Grid, Typography, Box } from '@mui/material';
 import Team from './Team';
-import { Grid, Typography, Box, CircularProgress } from '@mui/material';
+import PropTypes from 'prop-types';
 
-export default function TeamList() {
-    const [teams, setTeams] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const { user } = useAuth();
-
-    useEffect(() => {
-        const fetchTeams = async () => {
-            if (!user?.uid) return;
-
-            try {
-                setLoading(true);
-                const teamsRef = collection(db, 'teams');
-                const querySnapshot = await getDocs(teamsRef);
-
-                // Filter teams where the user's UID appears in playerUids values
-                const teamsData = querySnapshot.docs
-                    .map(doc => ({
-                        id: doc.id,
-                        ...doc.data()
-                    }))
-                    .filter(team => {
-                        // Check if user's UID is in playerUids values
-                        return Object.values(team.playerUids || {}).includes(user.uid);
-                    });
-
-                setTeams(teamsData);
-            } catch (error) {
-                console.error('Error fetching teams:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchTeams();
-    }, [user]);
-
-    if (loading) {
-        return (
-            <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
-                <CircularProgress />
-            </Box>
-        );
-    }
-
-    if (teams.length === 0) {
+export default function TeamList({ teams, onTeamUpdate, onTeamSelect, userId, showBookButton }) {
+    if (!teams || teams.length === 0) {
         return (
             <Box textAlign="center" py={4}>
                 <Typography variant="h6" color="textSecondary">
@@ -75,9 +29,43 @@ export default function TeamList() {
         >
             {teams.map(team => (
                 <Grid item xs={12} sm={6} md={4} lg={4} key={team.id}>
-                    <Team team={team} />
+                    <Team 
+                        team={team} 
+                        onTeamUpdate={onTeamUpdate}
+                        onTeamSelect={onTeamSelect}
+                        isCurrentUser={userId === team.captainId}
+                        showBookButton={showBookButton}
+                    />
                 </Grid>
             ))}
         </Grid>
     );
-} 
+}
+
+TeamList.propTypes = {
+    teams: PropTypes.arrayOf(PropTypes.shape({
+        id: PropTypes.string.isRequired,
+        teamName: PropTypes.string.isRequired,
+        sport: PropTypes.string.isRequired,
+        players: PropTypes.object.isRequired,
+        playerUids: PropTypes.object.isRequired,
+        playerCount: PropTypes.number.isRequired,
+        leagueNumber: PropTypes.number.isRequired,
+        captainId: PropTypes.string.isRequired,
+        matches: PropTypes.shape({
+            matchesWon: PropTypes.number.isRequired,
+            matchesLost: PropTypes.number.isRequired,
+            matchesTied: PropTypes.number.isRequired
+        }).isRequired
+    })).isRequired,
+    onTeamUpdate: PropTypes.func,
+    onTeamSelect: PropTypes.func,
+    userId: PropTypes.string.isRequired,
+    showBookButton: PropTypes.bool
+};
+
+TeamList.defaultProps = {
+    onTeamUpdate: () => {},
+    onTeamSelect: () => {},
+    showBookButton: false
+}; 

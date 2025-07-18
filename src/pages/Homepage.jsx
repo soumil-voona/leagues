@@ -1,27 +1,28 @@
 import Title from "../components/Title";
 import Header from "../components/Header";
-import "../styles/homepage.css";
+import "../styles/Homepage.css";
 import Profile from "../components/Profile";
 import { useState, useEffect } from "react";
 import { useAuth } from "../hooks/useAuth.jsx";
 import { useNavigate } from "react-router-dom";
 import { getFirestore, doc, getDoc } from "firebase/firestore";
 import { app } from "../firebaseConfig";
+import { Box, CircularProgress } from "@mui/material";
 
 export default function Homepage() {
   const [userName, setUserName] = useState("User Name");
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const db = getFirestore(app);
 
   useEffect(() => {
-    if (user === undefined) {
-      return; // Still initializing
+    if (authLoading) {
+      return;
     }
-    
+
     if (!user) {
-      navigate("/login");
+      setLoading(false);
       return;
     }
 
@@ -40,14 +41,38 @@ export default function Homepage() {
     };
 
     fetchUserData();
-  }, [user, navigate, db]);
+  }, [user, authLoading, db]);
 
-  if (loading || user === undefined) {
-    return <div style={{textAlign: 'center', marginTop: '20vh'}}>Loading...</div>;
+  if (authLoading || loading) {
+    return (
+      <Box 
+        display="flex" 
+        justifyContent="center" 
+        alignItems="center" 
+        minHeight="100vh"
+      >
+        <CircularProgress />
+      </Box>
+    );
   }
 
   if (!user) {
-    return null;
+    return (
+      <div>
+        <Header />
+        <div className="main-content">
+          <Title />
+          <div className="options">
+            <div className="option-choice" onClick={() => navigate('/login')}>
+              <p className="option-content">Login</p>
+            </div>
+            <div className="option-choice" onClick={() => navigate('/signup')}>
+              <p className="option-content">Sign Up</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const handleOptionClick = (path) => {
@@ -59,7 +84,7 @@ export default function Homepage() {
       <Header />
       <div className="main-content">
         <Title />
-        <Profile className="center-profile" sx={{ width: 100, height: 100 }} />
+        <Profile className="center-profile" sx={{ width: 150, height: 150 }} />
         <p className="name">{userName}</p>
 
         <div className="options">
@@ -74,6 +99,9 @@ export default function Homepage() {
           </div>
           <div className="option-choice" onClick={() => handleOptionClick("/leagues")}>
             <p className="option-content">Leagues</p>
+          </div>
+          <div className="option-choice" onClick={() => handleOptionClick("/requests")}>
+            <p className="option-content">Requests</p>
           </div>
         </div>
       </div>

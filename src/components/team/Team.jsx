@@ -1,10 +1,31 @@
 import { useState } from 'react';
-import { Card, CardContent, Typography, Box, Chip, Grid, IconButton, Collapse } from '@mui/material';
+import { 
+    Card, 
+    CardContent, 
+    Typography, 
+    Box, 
+    Chip, 
+    IconButton, 
+    Collapse,
+    Button,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    Alert,
+    CircularProgress,
+    Stack
+} from '@mui/material';
 import SportsSoccerIcon from '@mui/icons-material/SportsSoccer';
 import PersonIcon from '@mui/icons-material/Person';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import StarIcon from '@mui/icons-material/Star';
+import SportsIcon from '@mui/icons-material/Sports';
+import DeleteIcon from '@mui/icons-material/Delete';
 import Icon from './Icon';
+import PropTypes from 'prop-types';
+import { db } from '../../firebaseConfig';
+import { doc, deleteDoc, collection, query, where, getDocs, or } from 'firebase/firestore';
 
 const styles = {
     card: {
@@ -120,14 +141,84 @@ const styles = {
         fontSize: '12px',
         padding: '4px 8px',
         borderRadius: '6px'
+    },
+    actionButtons: {
+        marginTop: 2,
+        display: 'flex',
+        gap: 1
+    },
+    deleteButton: {
+        backgroundColor: '#d32f2f',
+        color: 'white',
+        '&:hover': {
+            backgroundColor: '#b71c1c'
+        }
+    },
+    bookButton: {
+        backgroundColor: '#2CBB34',
+        color: 'white',
+        '&:hover': {
+            backgroundColor: '#25a32a'
+        }
+    },
+    dialogTitle: {
+        backgroundColor: '#f5f5f5',
+        borderBottom: '1px solid rgba(0, 0, 0, 0.12)'
     }
 };
 
-export default function Team({ team }) {
+export default function Team({ team, onTeamSelect, onTeamUpdate, isCurrentUser, showBookButton }) {
     const [expanded, setExpanded] = useState(false);
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [deleteError, setDeleteError] = useState('');
+    const [isDeleting, setIsDeleting] = useState(false);
     
     const handleClick = () => {
         setExpanded(!expanded);
+    };
+
+    const handleBookClick = (e) => {
+        e.stopPropagation(); // Prevent card expansion
+        onTeamSelect(team);
+    };
+
+    const handleDeleteClick = (e) => {
+        e.stopPropagation(); // Prevent card expansion
+        setDeleteDialogOpen(true);
+    };
+
+    const handleDeleteTeam = async () => {
+        try {
+            setIsDeleting(true);
+            setDeleteError('');
+
+            // Delete associated matches
+            const matchesRef = collection(db, 'matches');
+            const matchesQuery = query(matchesRef, 
+                or(
+                    where('teamA', '==', team.id),
+                    where('teamB', '==', team.id)
+                )
+            );
+            const matchesSnapshot = await getDocs(matchesQuery);
+            
+            // Delete all matches involving this team
+            const deleteMatchPromises = matchesSnapshot.docs.map(doc => deleteDoc(doc.ref));
+            await Promise.all(deleteMatchPromises);
+
+            // Delete the team
+            await deleteDoc(doc(db, 'teams', team.id));
+            
+            setDeleteDialogOpen(false);
+            if (onTeamUpdate) {
+                onTeamUpdate(); // Refresh the teams list
+            }
+        } catch (error) {
+            console.error('Error deleting team:', error);
+            setDeleteError('Failed to delete team. Please try again.');
+        } finally {
+            setIsDeleting(false);
+        }
     };
 
     const getMatchesDisplay = () => {
@@ -136,79 +227,180 @@ export default function Team({ team }) {
     };
 
     return (
-        <Card sx={styles.card} onClick={handleClick}>
-            <CardContent sx={styles.content}>
-                <Box sx={styles.header}>
-                    <Box sx={styles.iconContainer}>
-                        <Icon sport={team.sport} />
-                    </Box>
-                    <Box sx={{ flex: 1 }}>
-                        <Typography sx={styles.teamName}>
-                            {team.teamName}
-                        </Typography>
-                        <Chip 
-                            label={`League ${team.leagueNumber}`}
-                            size="small"
-                            sx={styles.leagueChip}
-                        />
-                    </Box>
-                </Box>
-                
-                <Box sx={styles.statsContainer}>
-                    <Box sx={styles.statItem}>
-                        <PersonIcon sx={styles.statIcon} />
-                        <Typography sx={styles.statText}>
-                            {team.playerCount} Players
-                        </Typography>
-                    </Box>
-                    <Box sx={styles.statItem}>
-                        <EmojiEventsIcon sx={styles.statIcon} />
-                        <Typography sx={styles.statText}>
-                            {getMatchesDisplay()}
-                        </Typography>
-                    </Box>
-                </Box>
-
-                <Collapse in={expanded} timeout="auto" unmountOnExit>
-                    <Box sx={styles.membersSection}>
-                        <Typography 
-                            variant="subtitle1" 
-                            sx={{ 
-                                fontWeight: 600, 
-                                marginBottom: '16px',
-                                color: '#1a237e'
-                            }}
-                        >
-                            Team Members
-                        </Typography>
-                        <Box sx={styles.membersList}>
-                            {Object.entries(team.players).map(([playerName, playerData]) => (
-                                <Box 
-                                    key={playerName}
-                                    sx={{
-                                        ...styles.memberItem,
-                                        ...(playerData.isCaptain && styles.captainItem)
-                                    }}
-                                >
-                                    {playerData.isCaptain ? (
-                                        <StarIcon sx={{...styles.memberIcon, ...styles.captainIcon}} />
-                                    ) : (
-                                        <PersonIcon sx={styles.memberIcon} />
-                                    )}
-                                    <Typography sx={styles.memberName}>
-                                        {playerName}
-                                    </Typography>
-                                    {playerData.isCaptain && (
-                                        <Box component="span" sx={styles.captainBadge}>
-                                            Captain
-                                        </Box>
-                                    )}
-                                </Box>
-                            ))}
+        <>
+            <Card sx={styles.card} onClick={handleClick}>
+                <CardContent sx={styles.content}>
+                    <Box sx={styles.header}>
+                        <Box sx={styles.iconContainer}>
+                            <Icon sport={team.sport} />
+                        </Box>
+                        <Box sx={{ flex: 1 }}>
+                            <Typography sx={styles.teamName}>
+                                {team.teamName}
+                            </Typography>
+                            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', mt: 1 }}>
+                                <Chip 
+                                    label={`League ${team.leagueNumber}`}
+                                    size="small"
+                                    sx={styles.leagueChip}
+                                />
+                                <Chip 
+                                    icon={<SportsIcon sx={{ fontSize: '16px !important' }} />}
+                                    label={team.sport}
+                                    size="small"
+                                    sx={styles.leagueChip}
+                                />
+                            </Box>
                         </Box>
                     </Box>
-                </Collapse>
-            </CardContent>
-        </Card>
+                    
+                    <Box sx={styles.statsContainer}>
+                        <Box sx={styles.statItem}>
+                            <PersonIcon sx={styles.statIcon} />
+                            <Typography sx={styles.statText}>
+                                {team.playerCount} Players
+                            </Typography>
+                        </Box>
+                        <Box sx={styles.statItem}>
+                            <EmojiEventsIcon sx={styles.statIcon} />
+                            <Typography sx={styles.statText}>
+                                {getMatchesDisplay()}
+                            </Typography>
+                        </Box>
+                    </Box>
+
+                    <Collapse in={expanded} timeout="auto" unmountOnExit>
+                        <Box sx={styles.membersSection}>
+                            <Typography 
+                                variant="subtitle1" 
+                                sx={{ 
+                                    fontWeight: 600, 
+                                    marginBottom: '16px',
+                                    color: '#1a237e'
+                                }}
+                            >
+                                Team Members
+                            </Typography>
+                            <Box sx={styles.membersList}>
+                                {Object.entries(team.players).map(([playerName, playerData]) => (
+                                    <Box 
+                                        key={playerName}
+                                        sx={{
+                                            ...styles.memberItem,
+                                            ...(playerData.isCaptain && styles.captainItem)
+                                        }}
+                                    >
+                                        {playerData.isCaptain ? (
+                                            <StarIcon sx={{...styles.memberIcon, ...styles.captainIcon}} />
+                                        ) : (
+                                            <PersonIcon sx={styles.memberIcon} />
+                                        )}
+                                        <Typography sx={styles.memberName}>
+                                            {playerName}
+                                        </Typography>
+                                        {playerData.isCaptain && (
+                                            <Box component="span" sx={styles.captainBadge}>
+                                                Captain
+                                            </Box>
+                                        )}
+                                    </Box>
+                                ))}
+                            </Box>
+                        </Box>
+                        {isCurrentUser && (
+                            <Button
+                                variant="contained"
+                                onClick={handleDeleteClick}
+                                fullWidth
+                                startIcon={<DeleteIcon />}
+                                sx={styles.deleteButton}
+                                style={{marginTop: '10px', borderRadius: '10px'}}
+                            >
+                                Delete Team
+                            </Button>
+                        )}
+                    </Collapse>
+
+                    <Stack direction="row" spacing={1} sx={styles.actionButtons}>
+                        {showBookButton && (
+                            <Button
+                                variant="contained"
+                                onClick={handleBookClick}
+                                fullWidth
+                                sx={styles.bookButton}
+                            >
+                                Book Match
+                            </Button>
+                        )}
+                    </Stack>
+                </CardContent>
+            </Card>
+
+            {/* Delete Confirmation Dialog */}
+            <Dialog
+                open={deleteDialogOpen}
+                onClose={() => !isDeleting && setDeleteDialogOpen(false)}
+                onClick={(e) => e.stopPropagation()}
+            >
+                <DialogTitle sx={styles.dialogTitle}>
+                    Delete Team
+                </DialogTitle>
+                <DialogContent sx={{ pt: 2 }}>
+                    {deleteError && (
+                        <Alert severity="error" sx={{ mb: 2 }}>
+                            {deleteError}
+                        </Alert>
+                    )}
+                    <Typography>
+                        Are you sure you want to delete the team "{team.teamName}"? This action cannot be undone and will also delete all associated matches.
+                    </Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button 
+                        onClick={() => setDeleteDialogOpen(false)}
+                        color="primary"
+                        disabled={isDeleting}
+                    >
+                        Cancel
+                    </Button>
+                    <Button 
+                        onClick={handleDeleteTeam}
+                        color="error"
+                        variant="contained"
+                        disabled={isDeleting}
+                        startIcon={isDeleting ? <CircularProgress size={20} /> : null}
+                    >
+                        {isDeleting ? 'Deleting...' : 'Delete Team'}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+        </>
     );
 }
+
+Team.propTypes = {
+    team: PropTypes.shape({
+        id: PropTypes.string.isRequired,
+        teamName: PropTypes.string.isRequired,
+        sport: PropTypes.string.isRequired,
+        players: PropTypes.object.isRequired,
+        playerCount: PropTypes.number.isRequired,
+        leagueNumber: PropTypes.number.isRequired,
+        matches: PropTypes.shape({
+            matchesWon: PropTypes.number,
+            matchesLost: PropTypes.number,
+            matchesTied: PropTypes.number
+        })
+    }).isRequired,
+    onTeamSelect: PropTypes.func,
+    onTeamUpdate: PropTypes.func,
+    isCurrentUser: PropTypes.bool,
+    showBookButton: PropTypes.bool
+};
+
+Team.defaultProps = {
+    onTeamSelect: () => {},
+    onTeamUpdate: () => {},
+    isCurrentUser: false,
+    showBookButton: false
+};

@@ -12,7 +12,7 @@ export default function Menu() {
 
     return (
         <div>
-            {!showMenu && <MenuIcon onClick={handleClick} sx={{marginLeft: "25px"}}/>}
+            {!showMenu && <MenuIcon onClick={handleClick} sx={{marginLeft: "25px", cursor: "pointer"}}/>}
             {showMenu && <CompleteMenu setShowMenu={setShowMenu}/>}
         </div>
     );

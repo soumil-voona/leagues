@@ -1,15 +1,59 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { collection, query, getDocs } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import Header from "../components/Header";
 import TeamList from "../components/team/TeamList";
 import Title from "../components/Title";
 import CreateTeamModal from "../components/team/CreateTeamModal";
-import { Button, Box, Container, Typography } from '@mui/material';
+import { Button, Box, Container, Typography, CircularProgress } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import { useAuth } from '../hooks/useAuth';
 import "../styles/teams.css";
 
 export default function Teams() {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [teams, setTeams] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const { user } = useAuth();
+
+    const fetchTeams = async () => {
+        if (!user?.uid) return;
+
+        try {
+            setLoading(true);
+            setError(null);
+            const teamsRef = collection(db, 'teams');
+            const querySnapshot = await getDocs(teamsRef);
+
+            // Filter teams where the user's UID appears in playerUids values
+            const teamsData = querySnapshot.docs
+                .map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }))
+                .filter(team => {
+                    // Check if user's UID is in playerUids values
+                    return Object.values(team.playerUids || {}).includes(user.uid);
+                });
+
+            setTeams(teamsData);
+        } catch (error) {
+            console.error('Error fetching teams:', error);
+            setError('Failed to load teams. Please try again later.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchTeams();
+    }, [user]);
+
+    const handleTeamCreated = () => {
+        setIsModalOpen(false);
+        fetchTeams(); // Refresh the teams list
+    };
 
     return (
         <Box sx={{ minHeight: '100vh', bgcolor: '#f8f9fa' }}>
@@ -64,12 +108,27 @@ export default function Teams() {
                     </Button>
                 </Box>
 
-                <TeamList />
+                {loading ? (
+                    <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+                        <CircularProgress />
+                    </Box>
+                ) : error ? (
+                    <Box textAlign="center" py={4}>
+                        <Typography color="error">{error}</Typography>
+                    </Box>
+                ) : (
+                    <TeamList 
+                        teams={teams} 
+                        onTeamUpdate={fetchTeams}
+                        userId={user?.uid}
+                    />
+                )}
             </Container>
 
             <CreateTeamModal 
                 open={isModalOpen} 
                 onClose={() => setIsModalOpen(false)}
+                onTeamCreated={handleTeamCreated}
             />
         </Box>
     );
