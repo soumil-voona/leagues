@@ -3,10 +3,18 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    margin: 10px 25px 0px 0px;
+    background: linear-gradient(135deg, #7dd482 0%, #25a32a 100%);
+    /* background-color: linear-gradient(135deg, #2CBB34 0%, #25a32a 100%); */
+    /* margin: 10px 25px 0px 0px; */
 }
 
 .user-avatar {
-    margin-left: auto;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    margin-right: 20px;
 }
+/* 
+.user-avatar {
+    margin-left: auto;
+} */
 

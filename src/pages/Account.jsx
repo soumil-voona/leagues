@@ -1,3 +1,6 @@
+import Menu from '../components/menu/Menu';
+import '../styles/account.css';
+
 import { useState } from 'react';
 import { 
     Avatar,
@@ -52,7 +55,7 @@ const styles = {
         '&::before': {
             content: '""',
             position: 'absolute',
-            top: 0,
+            top: "40px",
             left: 0,
             right: 0,
             height: '300px',
@@ -242,123 +245,123 @@ export default function Account() {
         return '?';
     };
 
-    const handleImageUpload = async (event) => {
-        try {
-            setLoading(true);
-            setError('');
-            const file = event.target.files[0];
-            if (!file) {
-                setError('No file selected');
-                setLoading(false);
-                return;
-            }
+    // const handleImageUpload = async (event) => {
+    //     try {
+    //         setLoading(true);
+    //         setError('');
+    //         const file = event.target.files[0];
+    //         if (!file) {
+    //             setError('No file selected');
+    //             setLoading(false);
+    //             return;
+    //         }
 
-            // Validate file type and size
-            const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
-            if (!validTypes.includes(file.type)) {
-                setError('Please upload a valid image file (JPEG, PNG, or GIF)');
-                setLoading(false);
-                return;
-            }
+    //         // Validate file type and size
+    //         const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+    //         if (!validTypes.includes(file.type)) {
+    //             setError('Please upload a valid image file (JPEG, PNG, or GIF)');
+    //             setLoading(false);
+    //             return;
+    //         }
 
-            if (file.size > 5 * 1024 * 1024) { // 5MB limit
-                setError('Image size should be less than 5MB');
-                setLoading(false);
-                return;
-            }
+    //         if (file.size > 5 * 1024 * 1024) { // 5MB limit
+    //             setError('Image size should be less than 5MB');
+    //             setLoading(false);
+    //             return;
+    //         }
 
-            console.log('Starting image upload process...');
-            console.log('File details:', {
-                name: file.name,
-                type: file.type,
-                size: file.size
-            });
+    //         console.log('Starting image upload process...');
+    //         console.log('File details:', {
+    //             name: file.name,
+    //             type: file.type,
+    //             size: file.size
+    //         });
 
-            // Delete old profile picture if exists
-            if (user?.photoURL) {
-                try {
-                    console.log('Attempting to delete old profile picture...');
-                    // const oldImageRef = ref(storage, `profilePictures/${user.uid}/profile`); // This line is removed as per the new_code
-                    // await deleteObject(oldImageRef); // This line is removed as per the new_code
-                    console.log('Old profile picture deleted successfully');
-                } catch (error) {
-                    console.log('No old image found or error deleting:', error);
-                    // Continue with upload even if delete fails
-                }
-            }
+    //         // Delete old profile picture if exists
+    //         if (user?.photoURL) {
+    //             try {
+    //                 console.log('Attempting to delete old profile picture...');
+    //                 // const oldImageRef = ref(storage, `profilePictures/${user.uid}/profile`); // This line is removed as per the new_code
+    //                 // await deleteObject(oldImageRef); // This line is removed as per the new_code
+    //                 console.log('Old profile picture deleted successfully');
+    //             } catch (error) {
+    //                 console.log('No old image found or error deleting:', error);
+    //                 // Continue with upload even if delete fails
+    //             }
+    //         }
 
-            // Create storage reference
-            console.log('Creating new storage reference...');
-            // const storageRef = ref(storage, `profilePictures/${user.uid}/profile`); // This line is removed as per the new_code
+    //         // Create storage reference
+    //         console.log('Creating new storage reference...');
+    //         // const storageRef = ref(storage, `profilePictures/${user.uid}/profile`); // This line is removed as per the new_code
             
-            // Upload new image
-            console.log('Starting file upload...');
-            // const uploadResult = await uploadBytes(storageRef, file); // This line is removed as per the new_code
-            console.log('File uploaded successfully:', 'dummy_upload_result'); // Placeholder for uploadResult
+    //         // Upload new image
+    //         console.log('Starting file upload...');
+    //         // const uploadResult = await uploadBytes(storageRef, file); // This line is removed as per the new_code
+    //         console.log('File uploaded successfully:', 'dummy_upload_result'); // Placeholder for uploadResult
 
-            // Get download URL
-            console.log('Getting download URL...');
-            // const downloadURL = await getDownloadURL(uploadResult.ref); // This line is removed as per the new_code
-            const downloadURL = 'https://via.placeholder.com/150'; // Placeholder for downloadURL
-            console.log('Got download URL:', downloadURL);
+    //         // Get download URL
+    //         console.log('Getting download URL...');
+    //         // const downloadURL = await getDownloadURL(uploadResult.ref); // This line is removed as per the new_code
+    //         const downloadURL = 'https://via.placeholder.com/150'; // Placeholder for downloadURL
+    //         console.log('Got download URL:', downloadURL);
 
-            // Update user profile
-            console.log('Updating user profile...');
-            await updateProfile(user, {
-                photoURL: downloadURL
-            });
-            console.log('Profile updated successfully');
+    //         // Update user profile
+    //         console.log('Updating user profile...');
+    //         await updateProfile(user, {
+    //             photoURL: downloadURL
+    //         });
+    //         console.log('Profile updated successfully');
 
-            setSuccess('Profile picture updated successfully');
-            setLoading(false);
-        } catch (error) {
-            console.error('Error in image upload process:', error);
-            let errorMessage = 'Failed to update profile picture';
+    //         setSuccess('Profile picture updated successfully');
+    //         setLoading(false);
+    //     } catch (error) {
+    //         console.error('Error in image upload process:', error);
+    //         let errorMessage = 'Failed to update profile picture';
             
-            // More specific error messages based on the error
-            if (error.code === 'storage/unauthorized') {
-                errorMessage = 'Permission denied. Please try logging out and back in.';
-            } else if (error.code === 'storage/quota-exceeded') {
-                errorMessage = 'Storage quota exceeded. Please contact support.';
-            } else if (error.code === 'storage/invalid-url') {
-                errorMessage = 'Invalid storage location. Please try again.';
-            } else if (error.code === 'storage/unknown') {
-                errorMessage = 'An unknown error occurred. Please try again.';
-            }
+    //         // More specific error messages based on the error
+    //         if (error.code === 'storage/unauthorized') {
+    //             errorMessage = 'Permission denied. Please try logging out and back in.';
+    //         } else if (error.code === 'storage/quota-exceeded') {
+    //             errorMessage = 'Storage quota exceeded. Please contact support.';
+    //         } else if (error.code === 'storage/invalid-url') {
+    //             errorMessage = 'Invalid storage location. Please try again.';
+    //         } else if (error.code === 'storage/unknown') {
+    //             errorMessage = 'An unknown error occurred. Please try again.';
+    //         }
             
-            setError(errorMessage);
-            setLoading(false);
-        }
-    };
+    //         setError(errorMessage);
+    //         setLoading(false);
+    //     }
+    // };
 
-    const handleRemovePhoto = async () => {
-        try {
-            setLoading(true);
+    // const handleRemovePhoto = async () => {
+    //     try {
+    //         setLoading(true);
             
-            // Delete profile picture from storage
-            if (user.photoURL) {
-                // const imageRef = ref(storage, `profilePictures/${user.uid}/profile`); // This line is removed as per the new_code
-                // try {
-                //     await deleteObject(imageRef);
-                // } catch (error) {
-                //     console.log("No image found in storage");
-                // }
-            }
+    //         // Delete profile picture from storage
+    //         if (user.photoURL) {
+    //             // const imageRef = ref(storage, `profilePictures/${user.uid}/profile`); // This line is removed as per the new_code
+    //             // try {
+    //             //     await deleteObject(imageRef);
+    //             // } catch (error) {
+    //             //     console.log("No image found in storage");
+    //             // }
+    //         }
 
-            // Remove photo URL from profile
-            await updateProfile(user, {
-                photoURL: null
-            });
+    //         // Remove photo URL from profile
+    //         await updateProfile(user, {
+    //             photoURL: null
+    //         });
 
-            setSuccess('Profile picture removed successfully');
-            // setOpenRemovePhotoDialog(false); // This line is removed as per the new_code
-            setLoading(false);
-        } catch (error) {
-            console.error('Error removing profile picture:', error);
-            setError('Failed to remove profile picture');
-            setLoading(false);
-        }
-    };
+    //         setSuccess('Profile picture removed successfully');
+    //         // setOpenRemovePhotoDialog(false); // This line is removed as per the new_code
+    //         setLoading(false);
+    //     } catch (error) {
+    //         console.error('Error removing profile picture:', error);
+    //         setError('Failed to remove profile picture');
+    //         setLoading(false);
+    //     }
+    // };
 
     const handleSave = async () => {
         try {
@@ -525,36 +528,34 @@ export default function Account() {
 
             {/* Main Content */}
             <Container sx={styles.mainContent}>
-                <Grid container spacing={3}>
-                    {/* Stats Section */}
-                    <Grid item xs={12}>
-                        <Grid container spacing={2}>
-                            <Grid item xs={12} sm={4}>
-                                <Paper sx={styles.statsCard}>
-                                    <Typography sx={styles.statValue}>
-                                        {user?.teams?.length || 0}
-                                    </Typography>
-                                    <Typography sx={styles.statLabel}>Teams Joined</Typography>
-                                </Paper>
-                            </Grid>
-                            <Grid item xs={12} sm={4}>
-                                <Paper sx={styles.statsCard}>
-                                    <Typography sx={styles.statValue}>
-                                        {user?.matchesPlayed || 0}
-                                    </Typography>
-                                    <Typography sx={styles.statLabel}>Matches Played</Typography>
-                                </Paper>
-                            </Grid>
-                            <Grid item xs={12} sm={4}>
-                                <Paper sx={styles.statsCard}>
-                                    <Typography sx={styles.statValue}>
-                                        {user?.wins || 0}
-                                    </Typography>
-                                    <Typography sx={styles.statLabel}>Matches Won</Typography>
-                                </Paper>
-                            </Grid>
+                <Grid item xs={12}>
+                    <Grid container spacing={3} justifyContent="center" mb={5}>
+                        <Grid item xs={12} md={8}>
+                        <Paper sx={styles.statsCard}>
+                            <Typography sx={styles.statValue}>
+                            {user?.teams?.length || 0}
+                            </Typography>
+                            <Typography sx={styles.statLabel}>Teams Joined</Typography>
+                        </Paper>
+                        </Grid>
+                        <Grid item xs={12} md={8}>
+                        <Paper sx={styles.statsCard}>
+                            <Typography sx={styles.statValue}>
+                            {user?.matchesPlayed || 0}
+                            </Typography>
+                            <Typography sx={styles.statLabel}>Matches Played</Typography>
+                        </Paper>
+                        </Grid>
+                        <Grid item xs={12} md={8}>
+                        <Paper sx={styles.statsCard}>
+                            <Typography sx={styles.statValue}>
+                            {user?.wins || 0}
+                            </Typography>
+                            <Typography sx={styles.statLabel}>Matches Won</Typography>
+                        </Paper>
                         </Grid>
                     </Grid>
+                </Grid>
 
                     {/* Profile Information */}
                     <Grid item xs={12}>
@@ -650,37 +651,8 @@ export default function Account() {
                                 </ListItem>
                             </List>
                         </Card>
-                    </Grid>
 
-                    {/* Danger Zone */}
-                    <Grid item xs={12}>
-                        <Card sx={{ ...styles.section, ...styles.dangerZone }}>
-                            <Typography sx={styles.sectionTitle}>
-                                <DeleteIcon sx={{ color: 'error.main' }} /> Danger Zone
-                            </Typography>
-                            <Button
-                                variant="outlined"
-                                color="error"
-                                startIcon={<DeleteIcon />}
-                                onClick={() => setOpenDeleteDialog(true)}
-                                sx={{
-                                    ...styles.actionButton,
-                                    bgcolor: 'transparent',
-                                    color: 'error.main',
-                                    border: '1px solid',
-                                    borderColor: 'error.main',
-                                    '&:hover': {
-                                        bgcolor: '#fff1f1',
-                                        borderColor: 'error.dark',
-                                        transform: 'translateY(-1px)',
-                                        boxShadow: '0 4px 12px rgba(211, 47, 47, 0.2)'
-                                    }
-                                }}
-                            >
-                                Delete Account
-                            </Button>
-                        </Card>
-                    </Grid>
+                    
 
                     {/* Logout Section */}
                     <Grid item xs={12}>
@@ -737,8 +709,38 @@ export default function Account() {
                         </Card>
                     </Grid>
                 </Grid>
-            </Container>
 
+                {/* Danger Zone */}
+                <Grid item xs={12}>
+                    <Card sx={{ ...styles.section, ...styles.dangerZone }}>
+                        <Typography sx={styles.sectionTitle}>
+                            <DeleteIcon sx={{ color: 'error.main' }} /> Danger Zone
+                        </Typography>
+                        <Button
+                            variant="outlined"
+                            color="error"
+                            startIcon={<DeleteIcon />}
+                            onClick={() => setOpenDeleteDialog(true)}
+                            sx={{
+                                ...styles.actionButton,
+                                bgcolor: 'transparent',
+                                color: 'error.main',
+                                border: '1px solid',
+                                borderColor: 'error.main',
+                                '&:hover': {
+                                    bgcolor: '#fff1f1',
+                                    borderColor: 'error.dark',
+                                    transform: 'translateY(-1px)',
+                                    boxShadow: '0 4px 12px rgba(211, 47, 47, 0.2)'
+                                }
+                            }}
+                        >
+                            Delete Account
+                        </Button>
+                    </Card>
+                </Grid>
+            </Container>
+            
             {/* Dialogs */}
             <Dialog 
                 open={openEmailDialog} 
