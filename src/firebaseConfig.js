@@ -1,9 +1,13 @@
-// Import the functions you need from the SDKs you need
+// Import the functions you need from the SDKs
 import { initializeApp } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
-import { getAnalytics } from 'firebase/analytics';
-import { getStorage } from 'firebase/storage';
+import {
+  initializeFirestore,
+  persistentLocalCache,
+  persistentMultipleTabManager
+} from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
+import { getStorage } from 'firebase/storage';
+import { getAnalytics } from 'firebase/analytics';
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -16,19 +20,28 @@ const firebaseConfig = {
   measurementId: "G-L971WYGL17"
 };
 
-// Initialize Firebase
+// Initialize Firebase App
 const app = initializeApp(firebaseConfig);
 
-// Initialize services
-const db = getFirestore(app);
+// Initialize Firestore with multi-tab persistence
+let db;
+try {
+  db = initializeFirestore(app, {
+    localCache: persistentLocalCache({
+      tabManager: persistentMultipleTabManager()
+    })
+  });
+} catch (error) {
+  console.warn('Error enabling Firestore multi-tab persistence:', error);
+}
+
+// Initialize other services
 const auth = getAuth(app);
 const storage = getStorage(app);
 
-// Initialize analytics only in browser environment
 let analytics = null;
 if (typeof window !== 'undefined') {
   analytics = getAnalytics(app);
 }
 
-// Export the initialized instances
 export { app, auth, db, storage, analytics };

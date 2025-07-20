@@ -1,5 +1,6 @@
 import Menu from '../components/menu/Menu';
 import '../styles/account.css';
+ // Import this instead of the old Grid
 
 import { useState } from 'react';
 import { 
@@ -13,8 +14,8 @@ import {
     DialogContent,
     DialogContentText,
     DialogTitle,
-    Grid,
     List,
+    Grid,
     ListItem,
     ListItemText,
     Paper,
@@ -519,7 +520,7 @@ export default function Account() {
                     fontWeight: 'bold',
                     fontSize: { xs: '1.5rem', sm: '2rem' }
                 }}>
-                    {user?.name.toUpperCase() || 'User Profile'}
+                    {user?.displayName?.toUpperCase() || 'User Profile'}
                 </Typography>
                 <Typography variant="subtitle1" sx={{ opacity: 0.9 }}>
                     {user?.email}
@@ -688,6 +689,7 @@ export default function Account() {
                                             await signOut();
                                         } catch (error) {
                                             setError('Failed to logout. Please try again.');
+                                            console.log(error);
                                         } finally {
                                             setLoading(false);
                                         }

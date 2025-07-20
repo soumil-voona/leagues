@@ -3,10 +3,6 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { createRoot } from 'react-dom/client';
 import { AuthProvider } from './hooks/useAuth.jsx';
 
-// Initialize Firebase
-import { app, db } from './firebaseConfig';
-import { enableMultiTabIndexedDbPersistence } from 'firebase/firestore';
-
 // Pages Imports
 import App from './pages/App';
 import Login from './pages/Login';
@@ -29,22 +25,12 @@ import AuthRedirect from './components/AuthRedirect';
 // Stylesheets
 import './styles/App.css';
 
+// Firebase initialized elsewhere
+import { app } from './firebaseConfig.js';
+
 // Validate Firebase initialization
 if (!app) {
   throw new Error('Firebase app not initialized correctly');
-}
-
-// Initialize Firestore with multi-tab support
-try {
-  enableMultiTabIndexedDbPersistence(db).catch((err) => {
-    if (err.code === 'failed-precondition') {
-      console.warn('Multiple tabs open, persistence can only be enabled in one tab at a time.');
-    } else if (err.code === 'unimplemented') {
-      console.warn('The current browser doesn\'t support all of the features required to enable persistence');
-    }
-  });
-} catch (error) {
-  console.warn('Error enabling Firestore persistence:', error);
 }
 
 const root = createRoot(document.getElementById('root'));
@@ -54,14 +40,6 @@ root.render(
     <AuthProvider>
       <Routes>
         {/* Public routes */}
-        <Route 
-          path="/" 
-          element={
-            <ProtectedRoute>
-              <Homepage />
-            </ProtectedRoute>
-          } 
-        />
         <Route
           path="/login"
           element={
@@ -80,6 +58,14 @@ root.render(
         />
 
         {/* Protected routes */}
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <Homepage />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/age"
           element={
