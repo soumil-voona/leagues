@@ -54,7 +54,14 @@ root.render(
     <AuthProvider>
       <Routes>
         {/* Public routes */}
-        <Route path="/" element={<Homepage />} />
+        <Route 
+          path="/" 
+          element={
+            <ProtectedRoute>
+              <Homepage />
+            </ProtectedRoute>
+          } 
+        />
         <Route
           path="/login"
           element={
