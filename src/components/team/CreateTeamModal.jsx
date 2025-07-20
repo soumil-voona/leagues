@@ -268,6 +268,20 @@ export default function CreateTeamModal({ open, onClose }) {
                 return;
             }
 
+            // Check if user already has a team in this sport and league
+            const userTeamsQuery = query(
+                teamsRef,
+                where('captainId', '==', user.uid),
+                where('sport', '==', sport),
+                where('leagueNumber', '==', parseInt(leagueNumber))
+            );
+            const userTeamsSnapshot = await getDocs(userTeamsQuery);
+
+            if (!userTeamsSnapshot.empty) {
+                setError(`You already have a team in ${sport} League ${leagueNumber}. You can't create multiple teams in the same sport and league.`);
+                return;
+            }
+
             const captainName = user.name || user.displayName || user.email.split('@')[0];
             console.log('Creating team with captain:', captainName); // Debug log
             const teamPlayers = {

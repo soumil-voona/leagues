@@ -282,29 +282,36 @@ export default function Team({ team, onTeamSelect, onTeamUpdate, isCurrentUser, 
                                 Team Members
                             </Typography>
                             <Box sx={styles.membersList}>
-                                {Object.entries(team.players).map(([playerName, playerData]) => (
-                                    <Box 
-                                        key={playerName}
-                                        sx={{
-                                            ...styles.memberItem,
-                                            ...(playerData.isCaptain && styles.captainItem)
-                                        }}
-                                    >
-                                        {playerData.isCaptain ? (
-                                            <StarIcon sx={{...styles.memberIcon, ...styles.captainIcon}} />
-                                        ) : (
-                                            <PersonIcon sx={styles.memberIcon} />
-                                        )}
-                                        <Typography sx={styles.memberName}>
-                                            {playerName}
-                                        </Typography>
-                                        {playerData.isCaptain && (
-                                            <Box component="span" sx={styles.captainBadge}>
-                                                Captain
-                                            </Box>
-                                        )}
-                                    </Box>
-                                ))}
+                                {Object.entries(team.players)
+                                    .sort(([, a], [, b]) => {
+                                        // Sort captain first
+                                        if (a.isCaptain && !b.isCaptain) return -1;
+                                        if (!a.isCaptain && b.isCaptain) return 1;
+                                        return 0;
+                                    })
+                                    .map(([playerName, playerData]) => (
+                                        <Box 
+                                            key={playerName}
+                                            sx={{
+                                                ...styles.memberItem,
+                                                ...(playerData.isCaptain && styles.captainItem)
+                                            }}
+                                        >
+                                            {playerData.isCaptain ? (
+                                                <StarIcon sx={{...styles.memberIcon, ...styles.captainIcon}} />
+                                            ) : (
+                                                <PersonIcon sx={styles.memberIcon} />
+                                            )}
+                                            <Typography sx={styles.memberName}>
+                                                {playerName}
+                                            </Typography>
+                                            {playerData.isCaptain && (
+                                                <Box component="span" sx={styles.captainBadge}>
+                                                    Captain
+                                                </Box>
+                                            )}
+                                        </Box>
+                                    ))}
                             </Box>
                         </Box>
                         {isCurrentUser && (

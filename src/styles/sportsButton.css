@@ -85,3 +85,18 @@
 .continue-button:disabled {
   background-color: #ccc !important;
 }
+
+/* Interactive elements */
+.MuiToggleButton-root,
+.continue-button,
+.sport-button,
+[role="button"] {
+  cursor: pointer !important;
+}
+
+.MuiToggleButton-root.Mui-disabled,
+.continue-button:disabled,
+.sport-button:disabled,
+[role="button"]:disabled {
+  cursor: not-allowed !important;
+}

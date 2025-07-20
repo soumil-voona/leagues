@@ -61,84 +61,112 @@ export default function Matches() {
     const { user } = useAuth();
     const navigate = useNavigate();
 
-    // Fetch all necessary data in one go
-    useEffect(() => {
-        const fetchAllData = async () => {
-            if (!user?.uid) {
-                setLoading(false);
-                return;
-            }
+    // Get unique sports from user's teams where they are captain
+    const captainSports = useMemo(() => {
+        return [...new Set(userTeams
+            .filter(team => team.captainId === user?.uid)
+            .map(team => team.sport)
+        )].sort();
+    }, [userTeams, user?.uid]);
 
-            try {
-                setLoading(true);
-                setError(null);
-
-                // Fetch user's teams and available sports
-                const teamsRef = collection(db, 'teams');
-                const teamsSnapshot = await getDocs(teamsRef);
-                const allTeams = teamsSnapshot.docs.map(doc => ({
+    const fetchUserTeams = async () => {
+        if (!user?.uid) return [];
+        
+        try {
+            const teamsRef = collection(db, 'teams');
+            const teamsSnapshot = await getDocs(teamsRef);
+            
+            // Filter teams where user is either captain or player
+            const userTeamsData = teamsSnapshot.docs
+                .map(doc => ({
                     id: doc.id,
                     ...doc.data()
-                }));
-
-                // Filter user's teams
-                const userTeamsData = allTeams.filter(team => {
+                }))
+                .filter(team => {
+                    // Check if user is captain or player
                     const players = team.players || {};
                     return Object.values(players).some(player => player.userId === user.uid);
                 });
 
-                // Get unique sports from user's teams
-                const userSports = [...new Set(userTeamsData.map(team => team.sport))];
-                const filteredAvailableSports = AVAILABLE_SPORTS.filter(sport => 
-                    userSports.includes(sport)
+            setUserTeams(userTeamsData);
+            return userTeamsData;
+        } catch (error) {
+            console.error('Error fetching user teams:', error);
+            return [];
+        }
+    };
+
+    const fetchTeamsWithPendingRequests = async () => {
+        try {
+            const matchesRef = collection(db, 'matches');
+            const pendingMatchesQuery = query(
+                matchesRef, 
+                where('status', '==', 'pending')
+            );
+            const pendingMatchesSnapshot = await getDocs(pendingMatchesQuery);
+            
+            const pendingTeams = new Set();
+            pendingMatchesSnapshot.docs.forEach(doc => {
+                const match = doc.data();
+                pendingTeams.add(match.teamA);
+                pendingTeams.add(match.teamB);
+            });
+            
+            setTeamsWithPendingRequests(pendingTeams);
+            return pendingTeams;
+        } catch (error) {
+            console.error('Error fetching teams with pending requests:', error);
+            return new Set();
+        }
+    };
+
+    const fetchTeams = async () => {
+        if (!user?.uid) return;
+
+        try {
+            setLoading(true);
+            setError(null);
+
+            // First get user's teams
+            const userTeamsData = await fetchUserTeams();
+            const userTeamIds = new Set(userTeamsData.map(team => team.id));
+
+            // Get teams with pending requests
+            const pendingTeams = await fetchTeamsWithPendingRequests();
+
+            // Then get all other teams
+            const teamsRef = collection(db, 'teams');
+            const querySnapshot = await getDocs(teamsRef);
+
+            const teamsData = querySnapshot.docs
+                .map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }))
+                .filter(team => 
+                    !userTeamIds.has(team.id) && // Exclude user's teams
+                    !pendingTeams.has(team.id) // Exclude teams with pending requests
                 );
 
-                // Fetch pending matches
-                const matchesRef = collection(db, 'matches');
-                const pendingMatchesQuery = query(
-                    matchesRef, 
-                    where('status', '==', 'pending')
-                );
-                const pendingMatchesSnapshot = await getDocs(pendingMatchesQuery);
-                const pendingTeams = new Set();
-                pendingMatchesSnapshot.docs.forEach(doc => {
-                    const match = doc.data();
-                    pendingTeams.add(match.teamA);
-                    pendingTeams.add(match.teamB);
-                });
-
-                // Filter available teams
-                const userTeamIds = new Set(userTeamsData.map(team => team.id));
-                const availableTeams = allTeams.filter(team => 
-                    !userTeamIds.has(team.id) && 
-                    !pendingTeams.has(team.id) &&
-                    filteredAvailableSports.includes(team.sport)
-                );
-
-                // Set all states at once
-                setUserTeams(userTeamsData);
-                setAvailableSports(filteredAvailableSports);
-                setTeamsWithPendingRequests(pendingTeams);
-                setTeams(availableTeams);
-
-                // Set initial sport selection if none selected
-                if (availableTeams.length > 0 && !selectedSport) {
-                    const firstAvailableSport = filteredAvailableSports[0];
-                    if (firstAvailableSport) {
-                        setSelectedSport(firstAvailableSport);
-                    }
-                }
-
-                setLoading(false);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-                setError('Failed to load teams. Please try again later.');
-                setLoading(false);
+            setTeams(teamsData);
+            
+            // Set initial sport selection if none selected
+            const userCaptainTeams = userTeamsData.filter(team => team.captainId === user.uid);
+            if (userCaptainTeams.length > 0 && !selectedSport) {
+                setSelectedSport(userCaptainTeams[0].sport);
             }
-        };
 
-        fetchAllData();
-    }, [user?.uid]); // Only depend on user ID
+        } catch (error) {
+            console.error('Error fetching teams:', error);
+            setError('Failed to load teams. Please try again later.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchTeams();
+    }, [user?.uid]);
 
     const handleSportChange = (event) => {
         setSelectedSport(event.target.value);
@@ -231,13 +259,19 @@ export default function Matches() {
 
     // Filter teams by selected sport and league number
     const filteredTeams = useMemo(() => {
-        if (!selectedSport || !selectedUserTeam) return teams;
+        if (!selectedSport) return [];
         
-        const userTeam = userTeams.find(t => t.id === selectedUserTeam);
-        return teams.filter(team => 
-            team.sport === selectedSport && 
-            team.leagueNumber === userTeam?.leagueNumber
-        );
+        // First filter by selected sport
+        const teamsBySport = teams.filter(team => team.sport === selectedSport);
+
+        // If a user team is selected, filter by league number
+        if (selectedUserTeam) {
+            const userTeam = userTeams.find(t => t.id === selectedUserTeam);
+            return teamsBySport.filter(team => team.leagueNumber === userTeam?.leagueNumber);
+        }
+
+        // If no user team selected, show all teams for the selected sport
+        return teamsBySport;
     }, [teams, selectedSport, selectedUserTeam, userTeams]);
 
     // Get eligible user teams for the selected opponent team's sport
@@ -246,10 +280,10 @@ export default function Matches() {
         
         return userTeams.filter(team => 
             team.sport === selectedTeam.sport && 
-            team.captainId === user.uid &&
+            team.captainId === user?.uid &&
             team.leagueNumber === selectedTeam.leagueNumber
         );
-    }, [selectedTeam, userTeams]);
+    }, [selectedTeam, userTeams, user?.uid]);
 
     return (
         <Box sx={{ minHeight: '100vh', bgcolor: '#f8f9fa' }}>
@@ -291,7 +325,7 @@ export default function Matches() {
                                     onChange={handleSportChange}
                                     label="Select Sport"
                                 >
-                                    {availableSports.map((sport) => (
+                                    {captainSports.map((sport) => (
                                         <MenuItem key={sport} value={sport}>
                                             {sport}
                                         </MenuItem>
@@ -330,66 +364,10 @@ export default function Matches() {
                     <Box textAlign="center" py={4}>
                         <Typography color="error">{error}</Typography>
                     </Box>
-                ) : userTeams.length === 0 ? (
-                    <Box 
-                        display="flex" 
-                        flexDirection="column" 
-                        alignItems="center" 
-                        justifyContent="center" 
-                        minHeight="300px"
-                        textAlign="center"
-                        sx={{
-                            background: 'linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%)',
-                            borderRadius: '16px',
-                            boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)',
-                            p: 4,
-                            border: '1px solid rgba(0, 0, 0, 0.05)'
-                        }}
-                    >
-                        <Typography 
-                            variant="h5" 
-                            component="h2" 
-                            sx={{ 
-                                mb: 2,
-                                fontWeight: 'bold',
-                                color: '#333'
-                            }}
-                        >
-                            You're not a captain of any teams
-                        </Typography>
-                        <Typography 
-                            variant="body1" 
-                            sx={{ 
-                                mb: 4,
-                                color: '#666',
-                                maxWidth: '600px'
-                            }}
-                        >
-                            To book matches, you need to be a team captain. Create your own team to get started!
-                        </Typography>
-                        <Button
-                            variant="contained"
-                            startIcon={<AddIcon />}
-                            onClick={() => navigate('/teams')}
-                            sx={{ 
-                                bgcolor: '#2CBB34',
-                                fontWeight: 'bold',
-                                textTransform: 'none',
-                                borderRadius: '8px',
-                                px: 4,
-                                py: 1.5,
-                                boxShadow: '0 2px 12px rgba(44, 187, 52, 0.3)',
-                                '&:hover': {
-                                    bgcolor: '#25a32a',
-                                    transform: 'translateY(-1px)',
-                                    boxShadow: '0 4px 12px rgba(44, 187, 52, 0.4)'
-                                },
-                                transition: 'all 0.2s ease-in-out'
-                            }}
-                        >
-                            Create a Team
-                        </Button>
-                    </Box>
+                ) : captainSports.length === 0 ? (
+                    <Alert severity="info" sx={{ mb: 3 }}>
+                        You need to be a team captain to book matches. Please create a team or ask your team captain to make match requests.
+                    </Alert>
                 ) : filteredTeams.length === 0 && selectedSport && selectedUserTeam ? (
                     <Box 
                         textAlign="center" 

@@ -84,7 +84,14 @@ export default function Homepage() {
       <Header />
       <div className="main-content">
         <Title />
-        <Profile className="center-profile" sx={{ width: 150, height: 150 }} />
+        <Profile 
+          className="center-profile" 
+          sx={{ 
+            width: { xs: 150, sm: 200, md: 250 }, 
+            height: { xs: 150, sm: 200, md: 250 },
+            fontSize: { xs: '3rem', sm: '4rem', md: '5rem' }
+          }} 
+        />
         <p className="name">{userName.toUpperCase()}</p>
 
         <div className="options">

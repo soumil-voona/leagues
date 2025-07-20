@@ -1,11 +1,17 @@
-.menu-item {
+.menu-item,
+.menu-content,
+[role="menuitem"] {
+    cursor: pointer !important;
     font-size: large;
-    cursor: pointer;
 }
 
 .menu-content {
     margin-top: 30px;
     font-size: 20px;
     font-weight: 800;
-    cursor: pointer;
+}
+
+.menu-item:disabled,
+[role="menuitem"]:disabled {
+    cursor: not-allowed !important;
 }

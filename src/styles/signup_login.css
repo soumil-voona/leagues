@@ -36,6 +36,24 @@
   background: #f8f9fa;
 }
 
+/* Interactive elements */
+button,
+.button,
+.google-btn,
+[role="button"],
+.link-highlight,
+.login-link,
+.signup-link {
+  cursor: pointer !important;
+}
+
+button:disabled,
+.button:disabled,
+.google-btn:disabled,
+[role="button"]:disabled {
+  cursor: not-allowed !important;
+}
+
 .login-form input:focus {
   border-color: var(--primary-color);
   box-shadow: 0 0 0 3px rgba(44, 187, 52, 0.1);

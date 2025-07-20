@@ -45,6 +45,7 @@ const styles = {
         py: 1,
         px: 2,
         color: '#666',
+        cursor: 'pointer',
         '&:hover': {
             bgcolor: 'rgba(0, 0, 0, 0.05)',
             transform: 'translateY(-1px)'
@@ -292,32 +293,40 @@ export default function TeamDetailsPage() {
                         </Typography>
                     </Box>
                     <List sx={styles.playerList}>
-                        {Object.entries(team.players || {}).map(([name, player], index) => (
-                            <ListItem key={name} sx={styles.playerItem}>
-                                <ListItemText
-                                    primary={
-                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                            <Typography sx={{ fontWeight: 'bold', color: '#333' }}>
-                                                {name}
-                                            </Typography>
-                                            {player.isCaptain && (
-                                                <Chip
-                                                    size="small"
-                                                    label="Captain"
-                                                    sx={{
-                                                        borderRadius: '8px',
-                                                        bgcolor: '#fff3e0',
-                                                        color: '#e65100',
-                                                        fontWeight: 'bold'
-                                                    }}
-                                                />
-                                            )}
-                                        </Box>
-                                    }
-                                    secondary={player.email}
-                                />
-                            </ListItem>
-                        ))}
+                        {Object.entries(team.players || {})
+                            .sort(([, a], [, b]) => {
+                                // Sort captain first, then alphabetically by name
+                                if (a.isCaptain && !b.isCaptain) return -1;
+                                if (!a.isCaptain && b.isCaptain) return 1;
+                                return 0;
+                            })
+                            .map(([name, player], index) => (
+                                <ListItem key={name} sx={styles.playerItem}>
+                                    <ListItemText
+                                        primary={
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                <Typography sx={{ fontWeight: 'bold', color: '#333' }}>
+                                                    {name}
+                                                </Typography>
+                                                {player.isCaptain && (
+                                                    <Chip
+                                                        size="small"
+                                                        label="Captain"
+                                                        sx={{
+                                                            borderRadius: '8px',
+                                                            bgcolor: '#fff3e0',
+                                                            color: '#e65100',
+                                                            fontWeight: 'bold',
+                                                            cursor: 'default'
+                                                        }}
+                                                    />
+                                                )}
+                                            </Box>
+                                        }
+                                        secondary={player.email}
+                                    />
+                                </ListItem>
+                            ))}
                     </List>
                 </Card>
 

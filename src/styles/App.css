@@ -8,6 +8,19 @@
   box-sizing: border-box;
 }
 
+/* Global button styles */
+button,
+[role="button"],
+.MuiButtonBase-root {
+  cursor: pointer !important;
+}
+
+button:disabled,
+[role="button"]:disabled,
+.MuiButtonBase-root.Mui-disabled {
+  cursor: not-allowed !important;
+}
+
 html,
 body {
   height: 100%;

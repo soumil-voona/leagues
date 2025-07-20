@@ -505,3 +505,19 @@ body {
     margin-top: 8px;
   }
 }
+
+/* Interactive elements */
+.age-slider,
+.sport-button,
+.continue-button,
+[role="button"],
+.interactive-element {
+  cursor: pointer !important;
+}
+
+.age-slider:disabled,
+.sport-button:disabled,
+.continue-button:disabled,
+[role="button"]:disabled {
+  cursor: not-allowed !important;
+}

@@ -57,6 +57,19 @@ body,
     font-weight: 900;
 }
 
+.option-choice,
+.auth-button,
+[role="button"],
+.interactive-element {
+    cursor: pointer !important;
+}
+
+.option-choice:disabled,
+.auth-button:disabled,
+[role="button"]:disabled {
+    cursor: not-allowed !important;
+}
+
 /* Public homepage styles */
 .welcome-section {
     text-align: center;
