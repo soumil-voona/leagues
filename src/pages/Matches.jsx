@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { 
     collection, 
     query, 
@@ -57,133 +57,116 @@ export default function Matches() {
     const [userTeams, setUserTeams] = useState([]);
     const [selectedUserTeam, setSelectedUserTeam] = useState('');
     const [teamsWithPendingRequests, setTeamsWithPendingRequests] = useState(new Set());
+    const [availableSports, setAvailableSports] = useState([]);
     const { user } = useAuth();
     const navigate = useNavigate();
 
-    // Get unique sports from both available sports and existing teams
-    const sports = [...new Set([
-        ...AVAILABLE_SPORTS,
-        ...teams.map(team => team.sport)
-    ])].sort();
+    // Fetch all necessary data in one go
+    useEffect(() => {
+        const fetchAllData = async () => {
+            if (!user?.uid) {
+                setLoading(false);
+                return;
+            }
 
-    const fetchUserTeams = async () => {
-        if (!user?.uid) return [];
-        
-        try {
-            const teamsRef = collection(db, 'teams');
-            const teamsQuery = query(teamsRef, where('captainId', '==', user.uid));
-            const teamsSnapshot = await getDocs(teamsQuery);
-            const userTeamsData = teamsSnapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            }));
-            setUserTeams(userTeamsData);
-            return userTeamsData;
-        } catch (error) {
-            console.error('Error fetching user teams:', error);
-            return [];
-        }
-    };
+            try {
+                setLoading(true);
+                setError(null);
 
-    const fetchTeamsWithPendingRequests = async () => {
-        try {
-            const matchesRef = collection(db, 'matches');
-            const pendingMatchesQuery = query(matchesRef, where('status', '==', 'pending'));
-            const pendingMatchesSnapshot = await getDocs(pendingMatchesQuery);
-            
-            const pendingTeams = new Set();
-            pendingMatchesSnapshot.docs.forEach(doc => {
-                const match = doc.data();
-                pendingTeams.add(match.teamA);
-                pendingTeams.add(match.teamB);
-            });
-            
-            setTeamsWithPendingRequests(pendingTeams);
-            return pendingTeams;
-        } catch (error) {
-            console.error('Error fetching teams with pending requests:', error);
-            return new Set();
-        }
-    };
-
-    const fetchTeams = async () => {
-        if (!user?.uid) return;
-
-        try {
-            setLoading(true);
-            setError(null);
-
-            // First get user's teams (only teams where user is captain)
-            const userTeamsData = await fetchUserTeams();
-            const userTeamIds = userTeamsData.map(team => team.id);
-
-            // Get teams with pending requests
-            const pendingTeams = await fetchTeamsWithPendingRequests();
-
-            // Then get all other teams
-            const teamsRef = collection(db, 'teams');
-            const querySnapshot = await getDocs(teamsRef);
-
-            const teamsData = querySnapshot.docs
-                .map(doc => ({
+                // Fetch user's teams and available sports
+                const teamsRef = collection(db, 'teams');
+                const teamsSnapshot = await getDocs(teamsRef);
+                const allTeams = teamsSnapshot.docs.map(doc => ({
                     id: doc.id,
                     ...doc.data()
-                }))
-                .filter(team => 
-                    !userTeamIds.includes(team.id) && // Exclude user's teams
-                    !pendingTeams.has(team.id) // Exclude teams with pending requests
+                }));
+
+                // Filter user's teams
+                const userTeamsData = allTeams.filter(team => {
+                    const players = team.players || {};
+                    return Object.values(players).some(player => player.userId === user.uid);
+                });
+
+                // Get unique sports from user's teams
+                const userSports = [...new Set(userTeamsData.map(team => team.sport))];
+                const filteredAvailableSports = AVAILABLE_SPORTS.filter(sport => 
+                    userSports.includes(sport)
                 );
 
-            setTeams(teamsData);
-            
-            // Set initial sport selection if none selected
-            if (teamsData.length > 0 && !selectedSport) {
-                const availableSports = [...new Set(teamsData.map(team => team.sport))];
-                if (availableSports.length > 0) {
-                    setSelectedSport(availableSports[0]);
-                }
-            }
-        } catch (error) {
-            console.error('Error fetching teams:', error);
-            setError('Failed to load teams. Please try again later.');
-        } finally {
-            setLoading(false);
-        }
-    };
+                // Fetch pending matches
+                const matchesRef = collection(db, 'matches');
+                const pendingMatchesQuery = query(
+                    matchesRef, 
+                    where('status', '==', 'pending')
+                );
+                const pendingMatchesSnapshot = await getDocs(pendingMatchesQuery);
+                const pendingTeams = new Set();
+                pendingMatchesSnapshot.docs.forEach(doc => {
+                    const match = doc.data();
+                    pendingTeams.add(match.teamA);
+                    pendingTeams.add(match.teamB);
+                });
 
-    useEffect(() => {
-        fetchTeams();
-    }, [user]);
+                // Filter available teams
+                const userTeamIds = new Set(userTeamsData.map(team => team.id));
+                const availableTeams = allTeams.filter(team => 
+                    !userTeamIds.has(team.id) && 
+                    !pendingTeams.has(team.id) &&
+                    filteredAvailableSports.includes(team.sport)
+                );
+
+                // Set all states at once
+                setUserTeams(userTeamsData);
+                setAvailableSports(filteredAvailableSports);
+                setTeamsWithPendingRequests(pendingTeams);
+                setTeams(availableTeams);
+
+                // Set initial sport selection if none selected
+                if (availableTeams.length > 0 && !selectedSport) {
+                    const firstAvailableSport = filteredAvailableSports[0];
+                    if (firstAvailableSport) {
+                        setSelectedSport(firstAvailableSport);
+                    }
+                }
+
+                setLoading(false);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                setError('Failed to load teams. Please try again later.');
+                setLoading(false);
+            }
+        };
+
+        fetchAllData();
+    }, [user?.uid]); // Only depend on user ID
 
     const handleSportChange = (event) => {
         setSelectedSport(event.target.value);
         setSelectedUserTeam(''); // Reset selected user team when sport changes
+        setSelectedTeam(null); // Reset selected opponent team
     };
 
-    const handleTeamSelect = async (team) => {
+    const handleTeamSelect = (team) => {
         setSelectedTeam(team);
         
-        try {
-            // Filter user teams by selected sport and ensure user is captain
-            const eligibleTeams = userTeams.filter(t => 
-                t.sport === team.sport && 
-                t.captainId === user.uid
-            );
-            
-            if (eligibleTeams.length === 0) {
-                setError('You must be a team captain to send match requests');
-                return;
-            }
-            
-            if (eligibleTeams.length === 1) {
-                setSelectedUserTeam(eligibleTeams[0].id);
-            }
-            
-            setOpenBookingDialog(true);
-        } catch (error) {
-            console.error('Error checking team eligibility:', error);
-            setError('Failed to check team eligibility. Please try again.');
+        // Filter user teams by selected sport and ensure user is captain
+        const eligibleTeams = userTeams.filter(t => 
+            t.sport === team.sport && 
+            t.captainId === user.uid &&
+            t.leagueNumber === team.leagueNumber
+        );
+        
+        if (eligibleTeams.length === 0) {
+            setError('You must be a team captain to send match requests');
+            return;
         }
+        
+        if (eligibleTeams.length === 1) {
+            setSelectedUserTeam(eligibleTeams[0].id);
+        }
+        
+        setOpenBookingDialog(true);
+        setError(null); // Clear any previous errors
     };
 
     const handleBookMatch = async () => {
@@ -239,7 +222,7 @@ export default function Matches() {
             setVenue('');
             
             // Refresh the teams list to update pending requests
-            fetchTeams();
+            // The useEffect will handle fetching all data again
         } catch (error) {
             console.error('Error booking match:', error);
             setError('Failed to book match. Please try again.');
@@ -247,22 +230,26 @@ export default function Matches() {
     };
 
     // Filter teams by selected sport and league number
-    const filteredTeams = selectedSport && selectedUserTeam
-        ? teams.filter(team => {
-            const userTeam = userTeams.find(t => t.id === selectedUserTeam);
-            return team.sport === selectedSport && 
-                   team.leagueNumber === userTeam?.leagueNumber;
-        })
-        : teams;
+    const filteredTeams = useMemo(() => {
+        if (!selectedSport || !selectedUserTeam) return teams;
+        
+        const userTeam = userTeams.find(t => t.id === selectedUserTeam);
+        return teams.filter(team => 
+            team.sport === selectedSport && 
+            team.leagueNumber === userTeam?.leagueNumber
+        );
+    }, [teams, selectedSport, selectedUserTeam, userTeams]);
 
     // Get eligible user teams for the selected opponent team's sport
-    const eligibleUserTeams = selectedTeam
-        ? userTeams.filter(team => 
+    const eligibleUserTeams = useMemo(() => {
+        if (!selectedTeam) return [];
+        
+        return userTeams.filter(team => 
             team.sport === selectedTeam.sport && 
             team.captainId === user.uid &&
             team.leagueNumber === selectedTeam.leagueNumber
-        )
-        : [];
+        );
+    }, [selectedTeam, userTeams]);
 
     return (
         <Box sx={{ minHeight: '100vh', bgcolor: '#f8f9fa' }}>
@@ -304,7 +291,7 @@ export default function Matches() {
                                     onChange={handleSportChange}
                                     label="Select Sport"
                                 >
-                                    {sports.map(sport => (
+                                    {availableSports.map((sport) => (
                                         <MenuItem key={sport} value={sport}>
                                             {sport}
                                         </MenuItem>

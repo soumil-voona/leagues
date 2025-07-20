@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { collection, query, getDocs } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import { useAuth } from '../hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 import Header from "../components/Header";
 import Title from "../components/Title";
 import {
@@ -18,7 +19,8 @@ import {
     Accordion,
     AccordionSummary,
     AccordionDetails,
-    Divider
+    Divider,
+    Button
 } from '@mui/material';
 import {
     ExpandMore as ExpandMoreIcon,
@@ -79,7 +81,12 @@ const styles = {
         flex: 1,
         fontWeight: 'bold',
         color: '#333',
-        fontFamily: 'Russo One'
+        fontFamily: 'Russo One',
+        cursor: 'pointer',
+        '&:hover': {
+            color: '#2CBB34',
+            textDecoration: 'underline'
+        }
     },
     stats: {
         display: 'flex',
@@ -115,6 +122,7 @@ const styles = {
 };
 
 export default function Leagues() {
+    const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [leagueData, setLeagueData] = useState({});
@@ -194,6 +202,10 @@ export default function Leagues() {
         fetchLeagueData();
     }, [user]);
 
+    const handleTeamClick = (teamId) => {
+        navigate(`/teams/${teamId}`);
+    };
+
     if (loading) {
         return (
             <Box>
@@ -262,7 +274,10 @@ export default function Leagues() {
                                                     <Typography sx={styles.rank}>
                                                         #{index + 1}
                                                     </Typography>
-                                                    <Typography sx={styles.teamName}>
+                                                    <Typography 
+                                                        sx={styles.teamName}
+                                                        onClick={() => handleTeamClick(team.id)}
+                                                    >
                                                         {team.teamName.toUpperCase()}
                                                     </Typography>
                                                     <Box sx={styles.stats}>

@@ -193,9 +193,14 @@ export default function Requests() {
             const userTeamIds = teams.map(team => team.id);
             console.log('User team IDs:', userTeamIds); // Debug log
 
-            // Fetch incoming requests
+            // Fetch incoming requests - only pending or accepted matches that aren't completed
             const matchesRef = collection(db, 'matches');
-            const incomingQuery = query(matchesRef, where('teamB', 'in', userTeamIds));
+            const incomingQuery = query(
+                matchesRef,
+                where('teamB', 'in', userTeamIds),
+                where('status', 'in', ['pending', 'accepted']),
+                where('scoreConfirmed', '!=', true)
+            );
             const incomingSnapshot = await getDocs(incomingQuery);
             console.log('Incoming requests:', incomingSnapshot.docs.length); // Debug log
             
@@ -211,8 +216,13 @@ export default function Requests() {
                 };
             });
 
-            // Fetch outgoing requests
-            const outgoingQuery = query(matchesRef, where('teamA', 'in', userTeamIds));
+            // Fetch outgoing requests - only pending or accepted matches that aren't completed
+            const outgoingQuery = query(
+                matchesRef,
+                where('teamA', 'in', userTeamIds),
+                where('status', 'in', ['pending', 'accepted']),
+                where('scoreConfirmed', '!=', true)
+            );
             const outgoingSnapshot = await getDocs(outgoingQuery);
             console.log('Outgoing requests:', outgoingSnapshot.docs.length); // Debug log
             
@@ -228,13 +238,33 @@ export default function Requests() {
                 };
             });
 
-            console.log('Setting requests:', { incoming: incomingData, outgoing: outgoingData }); // Debug log
-            setIncomingRequests(incomingData);
-            setOutgoingRequests(outgoingData);
+            // Filter and sort requests
+            const sortedIncoming = incomingData
+                .filter(request => !request.scoreConfirmed) // Extra safety check
+                .sort((a, b) => {
+                    // Sort by status (pending first) then by date
+                    if (a.status !== b.status) {
+                        return a.status === 'pending' ? -1 : 1;
+                    }
+                    return new Date(b.createdAt?.toDate()) - new Date(a.createdAt?.toDate());
+                });
+
+            const sortedOutgoing = outgoingData
+                .filter(request => !request.scoreConfirmed) // Extra safety check
+                .sort((a, b) => {
+                    // Sort by status (pending first) then by date
+                    if (a.status !== b.status) {
+                        return a.status === 'pending' ? -1 : 1;
+                    }
+                    return new Date(b.createdAt?.toDate()) - new Date(a.createdAt?.toDate());
+                });
+
+            setIncomingRequests(sortedIncoming);
+            setOutgoingRequests(sortedOutgoing);
+            setLoading(false);
         } catch (error) {
             console.error('Error fetching requests:', error);
-            setError('Failed to load match requests. Please try again later.');
-        } finally {
+            setError('Failed to load match requests');
             setLoading(false);
         }
     };

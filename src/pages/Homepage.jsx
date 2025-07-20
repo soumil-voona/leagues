@@ -85,7 +85,7 @@ export default function Homepage() {
       <div className="main-content">
         <Title />
         <Profile className="center-profile" sx={{ width: 150, height: 150 }} />
-        <p className="name">{userName}</p>
+        <p className="name">{userName.toUpperCase()}</p>
 
         <div className="options">
           <div className="option-choice" onClick={() => handleOptionClick("/stats")}>

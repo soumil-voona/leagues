@@ -19,6 +19,8 @@ import Leagues from './pages/Leagues';
 import Matches from './pages/Matches';
 import Requests from './pages/Requests';
 import Upcoming from './pages/Upcoming';
+import TeamDetailsPage from './pages/TeamDetailsPage';
+import Stats from './pages/Stats';
 
 // Component Imports
 import ProtectedRoute from './components/ProtectedRoute';
@@ -100,6 +102,22 @@ root.render(
           element={
             <ProtectedRoute>
               <Leagues />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/teams/:teamId"
+          element={
+            <ProtectedRoute>
+              <TeamDetailsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/stats"
+          element={
+            <ProtectedRoute>
+              <Stats />
             </ProtectedRoute>
           }
         />

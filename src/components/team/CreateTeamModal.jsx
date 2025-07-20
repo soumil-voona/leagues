@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { collection, addDoc, serverTimestamp, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../../firebaseConfig';
+import {Filter} from 'bad-words';
 import {
     Dialog,
     DialogTitle,
@@ -30,6 +31,9 @@ import GroupsIcon from '@mui/icons-material/Groups';
 
 const sports = ["Soccer", "Basketball", "Tennis", "Volleyball", "Football"];
 const leagues = [1, 2, 3];
+
+// Initialize profanity filter
+const filter = new Filter();
 
 const styles = {
     dialog: {
@@ -243,6 +247,12 @@ export default function CreateTeamModal({ open, onClose }) {
 
         if (!teamName || !sport || !leagueNumber || !user) {
             setError('Please fill in all fields and ensure you are logged in');
+            return;
+        }
+
+        // Check for inappropriate team name
+        if (filter.isProfane(teamName)) {
+            setError('Please choose an appropriate team name without offensive language.');
             return;
         }
 

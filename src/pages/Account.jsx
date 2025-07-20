@@ -519,7 +519,7 @@ export default function Account() {
                     fontWeight: 'bold',
                     fontSize: { xs: '1.5rem', sm: '2rem' }
                 }}>
-                    {user?.displayName || 'User Profile'}
+                    {user?.name.toUpperCase() || 'User Profile'}
                 </Typography>
                 <Typography variant="subtitle1" sx={{ opacity: 0.9 }}>
                     {user?.email}
