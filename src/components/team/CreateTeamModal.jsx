@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { collection, addDoc, serverTimestamp, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../../firebaseConfig';
-import {Filter} from 'bad-words';
+import { Filter } from 'bad-words';
 import {
     Dialog,
     DialogTitle,
@@ -21,13 +21,16 @@ import {
     List,
     ListItem,
     ListItemText,
-    ListItemButton
+    ListItemButton,
+    Autocomplete,
+    CircularProgress
 } from '@mui/material';
 import { useAuth } from '../../hooks/useAuth';
 import CloseIcon from '@mui/icons-material/Close';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import SportsIcon from '@mui/icons-material/Sports';
 import GroupsIcon from '@mui/icons-material/Groups';
+import SearchIcon from '@mui/icons-material/Search';
 
 const sports = ["Soccer", "Basketball", "Tennis", "Volleyball", "Football"];
 const leagues = [1, 2, 3];
@@ -111,25 +114,6 @@ const styles = {
         padding: '12px',
         borderRadius: '8px',
         marginBottom: '16px'
-    },
-    userSelectionDialog: {
-        '& .MuiDialog-paper': {
-            width: '400px',
-            maxWidth: '90%',
-            borderRadius: '12px'
-        }
-    },
-    userList: {
-        width: '100%',
-        maxHeight: '300px',
-        overflowY: 'auto'
-    },
-    userListItem: {
-        borderRadius: '8px',
-        margin: '4px 0',
-        '&:hover': {
-            backgroundColor: '#f5f5f5'
-        }
     }
 };
 
@@ -138,102 +122,93 @@ export default function CreateTeamModal({ open, onClose }) {
     const [teamName, setTeamName] = useState('');
     const [sport, setSport] = useState('');
     const [leagueNumber, setLeagueNumber] = useState('');
-    const [playersInput, setPlayersInput] = useState('');
     const [players, setPlayers] = useState({});
     const [error, setError] = useState('');
-    const [matchingUsers, setMatchingUsers] = useState([]);
-    const [userSelectionOpen, setUserSelectionOpen] = useState(false);
-    const [pendingPlayerName, setPendingPlayerName] = useState('');
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchResults, setSearchResults] = useState([]);
+    const [searching, setSearching] = useState(false);
 
-    const findUserByName = async (name) => {
+    const searchUsers = async (searchText) => {
+        if (!searchText || searchText.length < 2) {
+            setSearchResults([]);
+            return;
+        }
+
         try {
+            setSearching(true);
             const usersRef = collection(db, 'users');
             const allUsersSnapshot = await getDocs(usersRef);
-            const matches = [];
+            const searchTextLower = searchText.toLowerCase();
 
-            console.log('Searching for user:', name);
+            const matches = allUsersSnapshot.docs
+                .map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }))
+                .filter(userData => {
+                    // Don't show current user
+                    if (userData.id === user.uid) return false;
 
-            for (const doc of allUsersSnapshot.docs) {
-                const userData = doc.data();
-                console.log('Checking user document:', doc.id, userData);
+                    // Don't show already added players
+                    if (players[userData.name]) return false;
 
-                // Check name field
-                if (userData.name === name) {
-                    matches.push({
-                        id: doc.id,
-                        name: userData.name,
-                        email: userData.email
-                    });
-                    continue;
-                }
+                    // Search in name and email
+                    const name = (userData.name || '').toLowerCase();
+                    const email = (userData.email || '').toLowerCase();
+                    const username = email.split('@')[0];
 
-                // Check email field (both full email and username part)
-                const email = userData.email || '';
-                const username = email.split('@')[0];
-                if (email === name || username === name) {
-                    matches.push({
-                        id: doc.id,
-                        name: userData.name || username,
-                        email: email
-                    });
-                }
-            }
+                    return name.includes(searchTextLower) ||
+                        email.includes(searchTextLower) ||
+                        username.includes(searchTextLower);
+                })
+                .slice(0, 5); // Limit to 5 results
 
-            console.log('Found matches:', matches);
-            return matches;
+            setSearchResults(matches);
         } catch (err) {
-            console.error('Error finding user:', err);
-            return [];
+            console.error('Error searching users:', err);
+            setError('Failed to search users. Please try again.');
+        } finally {
+            setSearching(false);
         }
     };
 
-    const handleAddPlayer = async (e) => {
-        if (e.key === ',' || e.key === 'Enter') {
-            e.preventDefault();
-            const newPlayer = playersInput.trim();
-            if (newPlayer && !(newPlayer in players)) {
-                console.log('Adding player:', newPlayer);
-                const matches = await findUserByName(newPlayer);
-                console.log('Found matches for player:', matches);
+    const handleAddPlayer = async (selectedUser) => {
+        if (!selectedUser) return;
 
-                if (matches.length === 0) {
-                    setError(`User "${newPlayer}" not found. Please enter a valid username or email.`);
-                    setPlayersInput('');
-                    return;
-                }
+        try {
+            // Check if there's already a pending invite for this user
+            const invitesRef = collection(db, 'teamInvites');
+            const existingInviteQuery = query(
+                invitesRef,
+                where('teamName', '==', teamName),
+                where('invitedUserId', '==', selectedUser.id),
+                where('status', '==', 'pending')
+            );
+            const existingInvites = await getDocs(existingInviteQuery);
 
-                if (matches.length === 1) {
-                    // If only one match, add directly
-                    addPlayerToTeam(matches[0]);
-                } else {
-                    // If multiple matches, show selection dialog
-                    setMatchingUsers(matches);
-                    setPendingPlayerName(newPlayer);
-                    setUserSelectionOpen(true);
-                }
-                setPlayersInput('');
+            if (!existingInvites.empty) {
+                setError(`An invite for ${selectedUser.name} is already pending.`);
+                return;
             }
+
+            // Add to temporary players list with pending status
+            setPlayers(prev => ({
+                ...prev,
+                [selectedUser.name]: {
+                    name: selectedUser.name,
+                    isCaptain: false,
+                    userId: selectedUser.id,
+                    email: selectedUser.email,
+                    status: 'pending'
+                }
+            }));
+
+            setSearchQuery('');
+            setSearchResults([]);
+        } catch (err) {
+            console.error('Error checking invites:', err);
+            setError('Failed to add player. Please try again.');
         }
-    };
-
-    const addPlayerToTeam = (selectedUser) => {
-        setPlayers({
-            ...players,
-            [selectedUser.name]: {
-                name: selectedUser.name,
-                isCaptain: false,
-                userId: selectedUser.id,
-                email: selectedUser.email
-            }
-        });
-        setError('');
-        setUserSelectionOpen(false);
-        setMatchingUsers([]);
-        setPendingPlayerName('');
-    };
-
-    const handleUserSelection = (selectedUser) => {
-        addPlayerToTeam(selectedUser);
     };
 
     const removePlayer = (playerToRemove) => {
@@ -283,56 +258,48 @@ export default function CreateTeamModal({ open, onClose }) {
             }
 
             const captainName = user.name || user.displayName || user.email.split('@')[0];
-            console.log('Creating team with captain:', captainName); // Debug log
             const teamPlayers = {
                 [captainName]: {
                     isCaptain: true,
                     userId: user.uid,
                     name: captainName,
-                    email: user.email // Add captain's email
-                },
-                ...players
-            };
-
-            // Find UIDs for all players
-            const playerUids = {
-                [captainName]: user.uid // Add captain's UID
-            };
-
-            // Look up UIDs for other players
-            console.log('Looking up UIDs for players:', Object.keys(players)); // Debug log
-            for (const [playerName, playerData] of Object.entries(players)) {
-                // If we already found the UID when adding the player, use that
-                if (playerData.userId) {
-                    console.log('Using cached UID for player:', playerName, playerData.userId); // Debug log
-                    playerUids[playerName] = playerData.userId;
-                } else {
-                    // Otherwise try to find it again
-                    console.log('Looking up UID for player:', playerName); // Debug log
-                    const uid = await findUserByName(playerName);
-                    console.log('Found UID:', uid); // Debug log
-                    if (uid) {
-                        playerUids[playerName] = uid;
-                        // Update the players object with the found UID
-                        teamPlayers[playerName].userId = uid;
-                    }
+                    email: user.email,
+                    status: 'accepted'
                 }
-            }
+            };
 
-            console.log('Final team data:', { teamPlayers, playerUids }); // Debug log
-
-            await addDoc(collection(db, 'teams'), {
+            // Create the team first
+            const teamDocRef = await addDoc(collection(db, 'teams'), {
                 teamName,
-                teamNameLower: teamName.toLowerCase().trim(), // Store lowercase version for case-insensitive comparison
+                teamNameLower: teamName.toLowerCase().trim(),
                 sport,
                 players: teamPlayers,
-                playerUids,
-                playerCount: Object.keys(teamPlayers).length,
+                playerCount: 1, // Start with just the captain
                 leagueNumber: parseInt(leagueNumber),
                 createdAt: serverTimestamp(),
                 captainId: user.uid,
                 matches: { matchesWon: 0, matchesLost: 0, matchesTied: 0 }
             });
+
+            // Send invites to all pending players
+            const invitesRef = collection(db, 'teamInvites');
+            const invitePromises = Object.entries(players).map(([playerName, playerData]) =>
+                addDoc(invitesRef, {
+                    teamId: teamDocRef.id,
+                    teamName: teamName,
+                    sport: sport,
+                    leagueNumber: parseInt(leagueNumber),
+                    invitedUserId: playerData.userId,
+                    invitedUserName: playerName,
+                    invitedUserEmail: playerData.email,
+                    captainId: user.uid,
+                    captainName: captainName,
+                    status: 'pending',
+                    createdAt: serverTimestamp()
+                })
+            );
+
+            await Promise.all(invitePromises);
 
             // Reset form
             setTeamName('');
@@ -348,168 +315,173 @@ export default function CreateTeamModal({ open, onClose }) {
     };
 
     return (
-        <>
-            <Dialog
-                open={open}
-                onClose={onClose}
-                maxWidth="sm"
-                fullWidth
-                sx={styles.dialog}
-            >
-                <DialogTitle sx={styles.dialogTitle}>
-                    <Typography variant="h2">Create New Team</Typography>
-                    <IconButton
-                        onClick={onClose}
-                        size="small"
-                        sx={styles.closeButton}
-                    >
-                        <CloseIcon />
-                    </IconButton>
-                </DialogTitle>
-                <form onSubmit={handleSubmit}>
-                    <DialogContent sx={styles.content}>
-                        {error && (
-                            <Paper elevation={0} sx={styles.error}>
-                                <Typography>{error}</Typography>
-                            </Paper>
-                        )}
+        <Dialog
+            open={open}
+            onClose={onClose}
+            maxWidth="sm"
+            fullWidth
+            sx={styles.dialog}
+        >
+            <DialogTitle sx={styles.dialogTitle}>
+                <Typography variant="h2">Create New Team</Typography>
+                <IconButton
+                    onClick={onClose}
+                    size="small"
+                    sx={styles.closeButton}
+                >
+                    <CloseIcon />
+                </IconButton>
+            </DialogTitle>
+            <form onSubmit={handleSubmit}>
+                <DialogContent sx={styles.content}>
+                    {error && (
+                        <Paper elevation={0} sx={styles.error}>
+                            <Typography>{error}</Typography>
+                        </Paper>
+                    )}
 
-                        <Box sx={styles.section}>
-                            <Typography sx={styles.sectionTitle}>
-                                <GroupsIcon fontSize="small" />
-                                Team Information
-                            </Typography>
-                            <TextField
-                                autoFocus
-                                fullWidth
-                                label="Team Name"
-                                variant="outlined"
-                                value={teamName}
-                                onChange={(e) => setTeamName(e.target.value)}
-                                sx={styles.formControl}
-                            />
-                        </Box>
+                    <Box sx={styles.section}>
+                        <Typography sx={styles.sectionTitle}>
+                            <GroupsIcon fontSize="small" />
+                            Team Information
+                        </Typography>
+                        <TextField
+                            autoFocus
+                            fullWidth
+                            label="Team Name"
+                            variant="outlined"
+                            value={teamName}
+                            onChange={(e) => setTeamName(e.target.value)}
+                            sx={styles.formControl}
+                        />
+                    </Box>
 
-                        <Box sx={styles.section}>
-                            <Typography sx={styles.sectionTitle}>
-                                <SportsIcon fontSize="small" />
-                                Sport & League Details
-                            </Typography>
-                            <Box sx={{ display: 'flex', gap: 2 }}>
-                                <FormControl fullWidth sx={styles.formControl}>
-                                    <InputLabel>Sport</InputLabel>
-                                    <Select
-                                        value={sport}
-                                        label="Sport"
-                                        onChange={(e) => setSport(e.target.value)}
-                                    >
-                                        {sports.map((sport) => (
-                                            <MenuItem key={sport} value={sport}>
-                                                {sport}
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
-
-                                <FormControl fullWidth sx={styles.formControl}>
-                                    <InputLabel>League #</InputLabel>
-                                    <Select
-                                        value={leagueNumber}
-                                        label="League #"
-                                        onChange={(e) => setLeagueNumber(e.target.value)}
-                                    >
-                                        {leagues.map((num) => (
-                                            <MenuItem key={num} value={num}>
-                                                {num}
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
-                            </Box>
-                        </Box>
-
-                        <Box sx={styles.section}>
-                            <Typography sx={styles.sectionTitle}>
-                                <PersonAddIcon fontSize="small" />
-                                Team Members
-                            </Typography>
+                    <Box sx={styles.section}>
+                        <Typography sx={styles.sectionTitle}>
+                            <SportsIcon fontSize="small" />
+                            Sport & League Details
+                        </Typography>
+                        <Box sx={{ display: 'flex', gap: 2 }}>
                             <FormControl fullWidth sx={styles.formControl}>
-                                <TextField
-                                    label="Add Team Members"
-                                    value={playersInput}
-                                    onChange={(e) => setPlayersInput(e.target.value.toLowerCase())}
-                                    onKeyDown={handleAddPlayer}
-                                    placeholder="Type names and press comma or enter"
-                                    variant="outlined"
-                                    helperText="Press comma or enter to add members"
-                                />
-                                <Box sx={styles.playerChips}>
-                                    {Object.entries(players).map(([playerName]) => (
-                                        <Chip
-                                            key={playerName}
-                                            label={playerName}
-                                            onDelete={() => removePlayer(playerName)}
-                                            sx={styles.chip}
-                                        />
+                                <InputLabel>Sport</InputLabel>
+                                <Select
+                                    value={sport}
+                                    label="Sport"
+                                    onChange={(e) => setSport(e.target.value)}
+                                >
+                                    {sports.map((sport) => (
+                                        <MenuItem key={sport} value={sport}>
+                                            {sport}
+                                        </MenuItem>
                                     ))}
-                                </Box>
+                                </Select>
+                            </FormControl>
+
+                            <FormControl fullWidth sx={styles.formControl}>
+                                <InputLabel>League #</InputLabel>
+                                <Select
+                                    value={leagueNumber}
+                                    label="League #"
+                                    onChange={(e) => setLeagueNumber(e.target.value)}
+                                >
+                                    {leagues.map((num) => (
+                                        <MenuItem key={num} value={num}>
+                                            {num}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
                             </FormControl>
                         </Box>
-                    </DialogContent>
-                    <DialogActions sx={styles.actions}>
-                        <Button
-                            onClick={onClose}
-                            sx={styles.cancelButton}
-                        >
-                            Cancel
-                        </Button>
-                        <Button
-                            type="submit"
-                            variant="contained"
-                            color="primary"
-                            sx={styles.createButton}
-                        >
-                            Create Team
-                        </Button>
-                    </DialogActions>
-                </form>
-            </Dialog>
+                    </Box>
 
-            {/* User Selection Dialog */}
-            <Dialog
-                open={userSelectionOpen}
-                onClose={() => setUserSelectionOpen(false)}
-                sx={styles.userSelectionDialog}
-            >
-                <DialogTitle>
-                    Multiple users found for "{pendingPlayerName}"
-                    <Typography variant="subtitle2" color="text.secondary">
-                        Please select the correct user
-                    </Typography>
-                </DialogTitle>
-                <DialogContent>
-                    <List sx={styles.userList}>
-                        {matchingUsers.map((user) => (
-                            <ListItem key={user.id} disablePadding>
-                                <ListItemButton
-                                    onClick={() => handleUserSelection(user)}
-                                    sx={styles.userListItem}
-                                >
-                                    <ListItemText
-                                        primary={user.name}
-                                        secondary={user.email}
+                    <Box sx={styles.section}>
+                        <Typography sx={styles.sectionTitle}>
+                            <PersonAddIcon fontSize="small" />
+                            Team Members
+                        </Typography>
+                        <FormControl fullWidth sx={styles.formControl}>
+                            <Autocomplete
+                                freeSolo
+                                options={searchResults}
+                                getOptionLabel={(option) =>
+                                    typeof option === 'string' ? option : option.name
+                                }
+                                filterOptions={(x) => x}
+                                value={null}
+                                inputValue={searchQuery}
+                                onInputChange={(event, newValue) => {
+                                    setSearchQuery(newValue);
+                                    searchUsers(newValue);
+                                }}
+                                onChange={(event, newValue) => {
+                                    if (newValue && typeof newValue !== 'string') {
+                                        handleAddPlayer(newValue);
+                                    }
+                                }}
+                                renderInput={(params) => (
+                                    <TextField
+                                        {...params}
+                                        label="Search Team Members"
+                                        variant="outlined"
+                                        InputProps={{
+                                            ...params.InputProps,
+                                            endAdornment: (
+                                                <>
+                                                    {searching ? (
+                                                        <CircularProgress color="inherit" size={20} />
+                                                    ) : (
+                                                        <SearchIcon color="action" />
+                                                    )}
+                                                    {params.InputProps.endAdornment}
+                                                </>
+                                            )
+                                        }}
                                     />
-                                </ListItemButton>
-                            </ListItem>
-                        ))}
-                    </List>
+                                )}
+                                renderOption={(props, option) => (
+                                    <ListItem {...props}>
+                                        <ListItemText
+                                            primary={option.name}
+                                            secondary={option.email}
+                                        />
+                                    </ListItem>
+                                )}
+                                noOptionsText={
+                                    searchQuery.length < 2
+                                        ? "Type at least 2 characters to search"
+                                        : "No users found"
+                                }
+                            />
+                            <Box sx={styles.playerChips}>
+                                {Object.entries(players).map(([playerName, playerData]) => (
+                                    <Chip
+                                        key={playerName}
+                                        label={playerName}
+                                        onDelete={() => removePlayer(playerName)}
+                                        sx={styles.chip}
+                                    />
+                                ))}
+                            </Box>
+                        </FormControl>
+                    </Box>
                 </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setUserSelectionOpen(false)}>
+                <DialogActions sx={styles.actions}>
+                    <Button
+                        onClick={onClose}
+                        sx={styles.cancelButton}
+                    >
                         Cancel
                     </Button>
+                    <Button
+                        type="submit"
+                        variant="contained"
+                        color="primary"
+                        sx={styles.createButton}
+                    >
+                        Create Team
+                    </Button>
                 </DialogActions>
-            </Dialog>
-        </>
+            </form>
+        </Dialog>
     );
 } 

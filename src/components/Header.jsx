@@ -1,16 +1,25 @@
 import Menu from './menu/Menu';
 import Profile from './Profile';
 import ChangeURLButton from './ChangeURLButton';
-
+import { Badge } from '@mui/material';
 import '../styles/header.css';
 
-export default function Header() {
+export default function Header({ pendingInvites = 0 }) {
     return (
         <div className='header'>
-            <Menu />
-            {/* Change hard coded value later!! */}
+            <Menu pendingInvites={pendingInvites} />
             <ChangeURLButton location="/account">
-                <Profile className='user-avatar'/>
+                <Badge
+                    badgeContent={pendingInvites}
+                    color="error"
+                    overlap="circular"
+                    anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                    }}
+                >
+                    <Profile className='user-avatar' />
+                </Badge>
             </ChangeURLButton>
         </div>
     );
