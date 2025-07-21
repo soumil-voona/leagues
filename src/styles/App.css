@@ -8,6 +8,27 @@
   box-sizing: border-box;
 }
 
+/* Added font styles */
+
+@font-face {
+  font-family: 'sporty-pro-regular';
+  src: url('/fonts/sporty-pro-regular.woff2') format('woff2'),
+       url('/fonts/sporty-pro-regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+* {
+  font-family: "Montserrat", sans-serif !important;
+  font-optical-sizing: auto !important;
+  font-weight: 300 !important;
+  font-style: normal !important;
+}
+
+.title {
+  font-family: "sporty-pro-regular", san-serif !important;
+}
+
 /* Global button styles */
 button,
 [role="button"],

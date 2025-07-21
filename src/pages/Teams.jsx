@@ -107,7 +107,7 @@ export default function Teams() {
                         fontWeight: 'bold',
                         color: '#333',
                         fontSize: { xs: '1.5rem', sm: '2rem' }
-                    }}>
+                    }} className='title'>
                         My Teams
                     </Typography>
                     <Button

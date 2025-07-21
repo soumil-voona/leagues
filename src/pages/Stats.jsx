@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { collection, query, getDocs } from 'firebase/firestore';
+import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import { useAuth } from '../hooks/useAuth';
 import Header from "../components/Header";
@@ -172,7 +172,7 @@ export default function Stats() {
                         color: '#333',
                         fontSize: { xs: '1.5rem', sm: '2rem' },
                         fontFamily: 'Russo One'
-                    }}>
+                    }} className='title'>
                         My Stats
                     </Typography>
                 </Box>

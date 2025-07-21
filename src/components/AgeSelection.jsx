@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './AgeSelection.css';
+import '../styles/AgeSelection.css';
 
 export default function AgeSelection({ onAgeChange }) {
   const [age, setAge] = useState(18);
@@ -14,7 +14,7 @@ export default function AgeSelection({ onAgeChange }) {
 
   return (
     <div className="age-selection">
-      <h2 className="age-title">How old are you?</h2>
+      <h2 className="age-title title">How old are you?</h2>
       
       <div className="slider-container">
         <input

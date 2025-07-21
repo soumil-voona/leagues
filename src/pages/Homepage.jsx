@@ -92,7 +92,7 @@ export default function Homepage() {
             fontSize: { xs: '3rem', sm: '4rem', md: '5rem' }
           }} 
         />
-        <p className="name">{userName.toUpperCase()}</p>
+        <p className="name title">{userName.toUpperCase()}</p>
 
         <div className="options">
           <div className="option-choice" onClick={() => handleOptionClick("/stats")}>

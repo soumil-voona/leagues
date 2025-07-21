@@ -411,7 +411,7 @@ export default function Matches() {
                         color: '#333',
                         fontSize: { xs: '1.5rem', sm: '2rem' },
                         fontFamily: 'Russo One'
-                    }}>
+                    }} className='title'>
                         Matches
                     </Typography>
                 </Box>

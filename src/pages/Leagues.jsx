@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { collection, query, getDocs } from 'firebase/firestore';
+import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
@@ -127,78 +127,78 @@ export default function Leagues() {
     const [error, setError] = useState(null);
     const [leagueData, setLeagueData] = useState({});
     const { user } = useAuth();
-
-    const fetchLeagueData = async () => {
-        if (!user?.uid) return;
-
-        try {
-            setLoading(true);
-            setError(null);
-
-            // Get all teams
-            const teamsRef = collection(db, 'teams');
-            const teamsSnapshot = await getDocs(teamsRef);
-            const allTeams = teamsSnapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            }));
-
-            // Find user's teams to get their leagues
-            const userTeams = allTeams.filter(team => {
-                const players = team.players || {};
-                return Object.values(players).some(player => player.userId === user.uid);
-            });
-
-            // Group teams by sport and league
-            const leaguesBySport = {};
-            userTeams.forEach(userTeam => {
-                const { sport, leagueNumber } = userTeam;
-                if (!leaguesBySport[sport]) {
-                    leaguesBySport[sport] = new Set();
-                }
-                leaguesBySport[sport].add(leagueNumber);
-            });
-
-            // For each sport and league, get all teams and sort by wins
-            const leagueData = {};
-            Object.entries(leaguesBySport).forEach(([sport, leagues]) => {
-                leagueData[sport] = {};
-                leagues.forEach(leagueNumber => {
-                    const teamsInLeague = allTeams.filter(team => 
-                        team.sport === sport && team.leagueNumber === leagueNumber
-                    );
-
-                    // Sort teams by wins (and other criteria for ties)
-                    const sortedTeams = teamsInLeague.sort((a, b) => {
-                        const aMatches = a.matches || { matchesWon: 0, matchesTied: 0, matchesLost: 0 };
-                        const bMatches = b.matches || { matchesWon: 0, matchesTied: 0, matchesLost: 0 };
-                        
-                        // Compare by wins first
-                        if (bMatches.matchesWon !== aMatches.matchesWon) {
-                            return bMatches.matchesWon - aMatches.matchesWon;
-                        }
-                        // If wins are equal, compare by ties
-                        if (bMatches.matchesTied !== aMatches.matchesTied) {
-                            return bMatches.matchesTied - aMatches.matchesTied;
-                        }
-                        // If ties are equal, compare by losses (fewer losses is better)
-                        return aMatches.matchesLost - bMatches.matchesLost;
-                    });
-
-                    leagueData[sport][leagueNumber] = sortedTeams;
-                });
-            });
-
-            setLeagueData(leagueData);
-        } catch (error) {
-            console.error('Error fetching league data:', error);
-            setError('Failed to load league data. Please try again later.');
-        } finally {
-            setLoading(false);
-        }
-    };
-
+    
     useEffect(() => {
+        const fetchLeagueData = async () => {
+            if (!user?.uid) return;
+
+            try {
+                setLoading(true);
+                setError(null);
+
+                // Get all teams
+                const teamsRef = collection(db, 'teams');
+                const teamsSnapshot = await getDocs(teamsRef);
+                const allTeams = teamsSnapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+
+                // Find user's teams to get their leagues
+                const userTeams = allTeams.filter(team => {
+                    const players = team.players || {};
+                    return Object.values(players).some(player => player.userId === user.uid);
+                });
+
+                // Group teams by sport and league
+                const leaguesBySport = {};
+                userTeams.forEach(userTeam => {
+                    const { sport, leagueNumber } = userTeam;
+                    if (!leaguesBySport[sport]) {
+                        leaguesBySport[sport] = new Set();
+                    }
+                    leaguesBySport[sport].add(leagueNumber);
+                });
+
+                // For each sport and league, get all teams and sort by wins
+                const leagueData = {};
+                Object.entries(leaguesBySport).forEach(([sport, leagues]) => {
+                    leagueData[sport] = {};
+                    leagues.forEach(leagueNumber => {
+                        const teamsInLeague = allTeams.filter(team => 
+                            team.sport === sport && team.leagueNumber === leagueNumber
+                        );
+
+                        // Sort teams by wins (and other criteria for ties)
+                        const sortedTeams = teamsInLeague.sort((a, b) => {
+                            const aMatches = a.matches || { matchesWon: 0, matchesTied: 0, matchesLost: 0 };
+                            const bMatches = b.matches || { matchesWon: 0, matchesTied: 0, matchesLost: 0 };
+                            
+                            // Compare by wins first
+                            if (bMatches.matchesWon !== aMatches.matchesWon) {
+                                return bMatches.matchesWon - aMatches.matchesWon;
+                            }
+                            // If wins are equal, compare by ties
+                            if (bMatches.matchesTied !== aMatches.matchesTied) {
+                                return bMatches.matchesTied - aMatches.matchesTied;
+                            }
+                            // If ties are equal, compare by losses (fewer losses is better)
+                            return aMatches.matchesLost - bMatches.matchesLost;
+                        });
+
+                        leagueData[sport][leagueNumber] = sortedTeams;
+                    });
+                });
+
+                setLeagueData(leagueData);
+            } catch (error) {
+                console.error('Error fetching league data:', error);
+                setError('Failed to load league data. Please try again later.');
+            } finally {
+                setLoading(false);
+            }
+        };
+
         fetchLeagueData();
     }, [user]);
 
@@ -243,7 +243,7 @@ export default function Leagues() {
                     fontSize: { xs: '1.5rem', sm: '2rem' },
                     fontFamily: 'Russo One',
                     mb: 4
-                }}>
+                }} className='title'>
                     League Standings
                 </Typography>
 

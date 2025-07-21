@@ -9,7 +9,7 @@ import {
     deleteDoc,
     serverTimestamp,
     Timestamp,
-    or
+    // or
 } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import { useAuth } from '../hooks/useAuth';
@@ -128,6 +128,7 @@ export default function Requests() {
     const [openDialog, setOpenDialog] = useState(false);
     const [dialogAction, setDialogAction] = useState('');
     const [activeTab, setActiveTab] = useState(0);
+    // eslint-disable-next-line no-unused-vars
     const [userTeams, setUserTeams] = useState([]);
     const { user } = useAuth();
 
@@ -271,6 +272,7 @@ export default function Requests() {
 
     useEffect(() => {
         fetchRequests();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user]);
 
     const handleAction = (request, action) => {
@@ -312,10 +314,10 @@ export default function Requests() {
         setActiveTab(newValue);
     };
 
-    const getTeamName = (teamId) => {
-        const team = userTeams.find(t => t.id === teamId);
-        return team ? team.name : 'Unknown Team';
-    };
+    // const getTeamName = (teamId) => {
+    //     const team = userTeams.find(t => t.id === teamId);
+    //     return team ? team.name : 'Unknown Team';
+    // };
 
     if (loading) {
         return (
@@ -341,7 +343,7 @@ export default function Requests() {
                         fontWeight: 'bold',
                         color: '#333',
                         fontSize: { xs: '1.5rem', sm: '2rem' }
-                    }}>
+                    }} className='title'>
                         Match Requests
                     </Typography>
                 </Box>

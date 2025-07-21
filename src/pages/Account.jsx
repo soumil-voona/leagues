@@ -1,5 +1,4 @@
 import Menu from '../components/menu/Menu';
-import '../styles/account.css';
  // Import this instead of the old Grid
 
 import { useState } from 'react';
