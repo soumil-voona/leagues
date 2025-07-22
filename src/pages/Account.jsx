@@ -551,7 +551,11 @@ export default function Account() {
         }
     };
 
-    console.log(user);
+    // console.log(user);
+    // console.log(teams);
+
+    const totalMatches = teams?.reduce((arc, team) => team.matches.matchesWon + team.matches.matchesTied + team.matches.matchesLost + arc, 0);
+    const userWins = teams?.reduce((arc, team) => team.matches.matchesWon + arc, 0);
 
     return (
         <Box sx={styles.container}>
@@ -588,7 +592,7 @@ export default function Account() {
                         <Grid item xs={12} md={8}>
                         <Paper sx={styles.statsCard}>
                             <Typography sx={styles.statValue}>
-                            {user?.matchesPlayed || 0}
+                            {totalMatches || 0}
                             </Typography>
                             <Typography sx={styles.statLabel}>Matches Played</Typography>
                         </Paper>
@@ -596,7 +600,7 @@ export default function Account() {
                         <Grid item xs={12} md={8}>
                         <Paper sx={styles.statsCard}>
                             <Typography sx={styles.statValue}>
-                            {user?.wins || 0}
+                            {userWins || 0}
                             </Typography>
                             <Typography sx={styles.statLabel}>Matches Won</Typography>
                         </Paper>

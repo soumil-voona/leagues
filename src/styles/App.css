@@ -23,6 +23,7 @@
   font-optical-sizing: auto !important;
   font-weight: 300 !important;
   font-style: normal !important;
+  flex-wrap: wrap !important;
 }
 
 .option-content, 
