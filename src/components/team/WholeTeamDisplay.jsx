@@ -5,7 +5,7 @@ export default function WholeTeamDisplay(props) {
     return (
         <div>
             <TeamDetails name={props.name} leagueNumber={props.leagueNumber} record={props.record} sport={props.sport}/>
-            {props.players.map((player) => <Player name={player.name} isCaptain={player.isCaptain}/>)}
+            {props.players.map((player) => <Player name={player.name.toLowerCase()} isCaptain={player.isCaptain}/>)}
         </div>
     );
 }

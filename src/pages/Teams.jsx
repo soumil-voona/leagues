@@ -74,6 +74,7 @@ export default function Teams() {
     const handleTeamCreated = () => {
         setIsModalOpen(false);
         fetchTeams();
+        window.location.reload();
     };
 
     const handleInviteAction = () => {

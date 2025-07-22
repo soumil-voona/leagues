@@ -15,7 +15,7 @@ export default function Homepage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const db = getFirestore(app);
-
+  console.log(user);
   useEffect(() => {
     if (authLoading) {
       return;
@@ -31,7 +31,8 @@ export default function Homepage() {
         const userDoc = await getDoc(doc(db, "users", user.uid));
         if (userDoc.exists()) {
           const userData = userDoc.data();
-          setUserName(userData.name);
+          console.log(userData);
+          // setUserName();
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
@@ -92,7 +93,7 @@ export default function Homepage() {
             fontSize: { xs: '3rem', sm: '4rem', md: '5rem' }
           }} 
         />
-        <p className="name title">{userName.toUpperCase()}</p>
+        <p className="name title">{user?.displayName.toUpperCase() || user?.name.toUpperCase() || "User Undefined"}</p>
 
         <div className="options">
           <div className="option-choice" onClick={() => handleOptionClick("/stats")}>

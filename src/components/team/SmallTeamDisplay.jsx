@@ -6,7 +6,7 @@ export default function SmallTeamDisplay(props) {
                 <div className="sport-icon">
                     <Icon sport={props.sport} />
                 </div>
-                <h2 className="team-name">{props.teamName}</h2>
+                <h2 className="team-name">{props.teamName.toLowerCase()}</h2>
             </div>
             <div className="team-details">
                 <div className="detail-item">

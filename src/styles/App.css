@@ -10,13 +10,13 @@
 
 /* Added font styles */
 
-@font-face {
+/* @font-face {
   font-family: 'sporty-pro-regular';
   src: url('/fonts/sporty-pro-regular.woff2') format('woff2'),
        url('/fonts/sporty-pro-regular.woff') format('woff');
   font-weight: normal;
   font-style: normal;
-}
+} */
 
 * {
   font-family: "Montserrat", sans-serif !important;
@@ -25,8 +25,30 @@
   font-style: normal !important;
 }
 
+.option-content, 
+.team-name, 
+.MuiTypography-root.MuiTypography-body1.css-1tdnqsy-MuiTypography-root,
+.MuiTypography-root.MuiTypography-h6.css-7dhkl6-MuiTypography-root,
+.MuiTypography-root.MuiTypography-h6.css-1ddlsdm-MuiTypography-root {
+  font-weight: bold !important;
+}
+
 .title {
-  font-family: "sporty-pro-regular", san-serif !important;
+  font-family: "sporty-pro", sans-serif !important;
+  font-weight: 400 !important;
+  font-style: normal !important;
+}
+
+.MuiBox-root.css-huskxe {
+  flex-wrap: wrap;
+}
+
+.title-image {
+  margin-top: 60px !important;
+}
+
+.MuiPaper-root.MuiPaper-elevation.MuiPaper-rounded.MuiPaper-elevation1.MuiCard-root.css-17f623t-MuiPaper-root-MuiCard-root {
+  width: 80vw;
 }
 
 /* Global button styles */

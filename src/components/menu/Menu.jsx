@@ -11,7 +11,7 @@ export default function Menu() {
     }
 
     return (
-        <div>
+        <div className='menu-div'>
             {!showMenu && <MenuIcon onClick={handleClick} sx={{marginLeft: "25px", cursor: "pointer"}}/>}
             {showMenu && <CompleteMenu setShowMenu={setShowMenu}/>}
         </div>

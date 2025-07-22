@@ -1,7 +1,7 @@
 import Menu from '../components/menu/Menu';
- // Import this instead of the old Grid
-
+import { getAuth } from 'firebase/auth';
 import { useState } from 'react';
+import { useEffect } from 'react';
 import { 
     Avatar,
     Box,
@@ -70,6 +70,7 @@ const styles = {
         mb: 4,
         position: 'relative',
         width: '100%',
+        marginTop: "10px",
         py: 4,
         color: 'white',
         zIndex: 1
@@ -79,6 +80,7 @@ const styles = {
         height: 150,
         fontSize: '3.5rem',
         fontWeight: 500,
+        marginTop: "30px",
         backgroundColor: '#25a32a',
         border: '4px solid white',
         boxShadow: '0 8px 20px rgba(44, 187, 52, 0.15)',
@@ -223,6 +225,7 @@ export default function Account() {
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const [openPasswordDialog, setOpenPasswordDialog] = useState(false);
     const [openEmailDialog, setOpenEmailDialog] = useState(false);
+    const [teams, setTeams] = useState([]);
 
     // Function to get user's initials
     const getInitials = () => {
@@ -243,7 +246,39 @@ export default function Account() {
         }
         
         return '?';
+    };  
+
+    const fetchTeams = async () => {
+        if (!user?.uid) return;
+
+        try {
+        setLoading(true);
+        setError(null);
+        const teamsRef = collection(db, 'teams');
+        const querySnapshot = await getDocs(teamsRef);
+
+        const teamsData = querySnapshot.docs
+            .map(doc => ({
+            id: doc.id,
+            ...doc.data()
+            }))
+            .filter(team => {
+            const players = team.players || {};
+            return Object.values(players).some(player => player.userId === user.uid);
+            });
+
+        setTeams(teamsData);
+        } catch (error) {
+        console.error('Error fetching teams:', error);
+        setError('Failed to load teams. Please try again later.');
+        } finally {
+        setLoading(false);
+        }
     };
+    
+    useEffect(() => {
+        fetchTeams(); // Call it here
+    }, [user]); // Dependency: only refetch when user changes
 
     // const handleImageUpload = async (event) => {
     //     try {
@@ -363,27 +398,34 @@ export default function Account() {
     //     }
     // };
 
+    
+
     const handleSave = async () => {
         try {
             setLoading(true);
             setError('');
 
-            if (formData.displayName !== user.displayName) {
-                await updateProfile(user, {
+            const auth = getAuth();
+            const currentUser = auth.currentUser;
+
+            if (!currentUser) throw new Error("User not logged in");
+
+            if (formData.displayName !== currentUser.displayName) {
+                await updateProfile(currentUser, {
                     displayName: formData.displayName
                 });
 
                 // Update display name in any teams where user is a member
                 const teamsRef = collection(db, 'teams');
-                const teamsQuery = query(teamsRef, where('playerUids', 'array-contains', user.uid));
+                const teamsQuery = query(teamsRef, where('playerUids', 'array-contains', currentUser.uid));
                 const teamsSnapshot = await getDocs(teamsQuery);
 
-                teamsSnapshot.forEach(async (teamDoc) => {
+                const updatePromises = teamsSnapshot.docs.map(async (teamDoc) => {
                     const teamData = teamDoc.data();
                     if (teamData.players) {
                         const updatedPlayers = { ...teamData.players };
                         Object.keys(updatedPlayers).forEach(playerName => {
-                            if (updatedPlayers[playerName].userId === user.uid) {
+                            if (updatedPlayers[playerName].userId === currentUser.uid) {
                                 updatedPlayers[playerName].name = formData.displayName;
                             }
                         });
@@ -392,11 +434,14 @@ export default function Account() {
                         });
                     }
                 });
+
+                await Promise.all(updatePromises);
             }
 
             setSuccess('Profile updated successfully');
             setEditMode(false);
             setLoading(false);
+            window.location.reload();
         } catch (error) {
             console.error('Error updating profile:', error);
             setError('Failed to update profile');
@@ -506,6 +551,8 @@ export default function Account() {
         }
     };
 
+    console.log(user);
+
     return (
         <Box sx={styles.container}>
             <Header />
@@ -519,7 +566,7 @@ export default function Account() {
                     fontWeight: 'bold',
                     fontSize: { xs: '1.5rem', sm: '2rem' }
                 }}>
-                    {user?.displayName?.toUpperCase() || 'User Profile'}
+                    {user?.displayName.toUpperCase() || user?.name.toUpperCase() || "User Undefined"}
                 </Typography>
                 <Typography variant="subtitle1" sx={{ opacity: 0.9 }}>
                     {user?.email}
@@ -533,7 +580,7 @@ export default function Account() {
                         <Grid item xs={12} md={8}>
                         <Paper sx={styles.statsCard}>
                             <Typography sx={styles.statValue}>
-                            {user?.teams?.length || 0}
+                            {teams.length || 0}
                             </Typography>
                             <Typography sx={styles.statLabel}>Teams Joined</Typography>
                         </Paper>

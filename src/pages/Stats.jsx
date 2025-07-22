@@ -191,7 +191,7 @@ export default function Stats() {
                                     <Box sx={styles.teamHeader}>
                                         <TeamIcon />
                                         <Typography variant="h6" sx={{ fontFamily: 'Russo One', color: '#333', flex: 1 }}>
-                                            {team.teamName.toUpperCase()}
+                                            {team.teamName.toLowerCase()}
                                         </Typography>
                                         <Chip
                                             icon={<SportsScoreIcon />}
