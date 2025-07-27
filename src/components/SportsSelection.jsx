@@ -8,6 +8,7 @@ import SportsSoccerIcon from '@mui/icons-material/SportsSoccer';
 import SportsBasketballIcon from '@mui/icons-material/SportsBasketball';
 import SportsVolleyballIcon from '@mui/icons-material/SportsVolleyball';
 import SportsFootballIcon from '@mui/icons-material/SportsFootball';
+import {FaTableTennis as TennisIcon} from 'react-icons/fa';
 // Custom CSS for the buttons
 import '../styles/sportsButton.css';
 
@@ -84,13 +85,9 @@ export default function SportsSelection({ selectedAge, name }) {
           <SportsBasketballIcon />
           <span className="sport-label">Basketball</span>
         </ToggleButton>
-        <ToggleButton value="badminton" aria-label="badminton">
-          <img
-            src='/badminton-racket-icon-free-vector-removebg-preview.png'
-            alt="Badminton"
-            style={{ pointerEvents: 'none' }}
-          />
-          <span className="sport-label">Badminton</span>
+        <ToggleButton value="tennis" aria-label="tennis">
+          <TennisIcon />
+          <span className="sport-label">Tennis</span>
         </ToggleButton>
         <ToggleButton value="football" aria-label="football">
           <SportsFootballIcon />
