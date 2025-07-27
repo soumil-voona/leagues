@@ -1,0 +1,33 @@
+.tutorials-home-container {
+    padding: 2rem;
+    text-align: center;
+  }
+  
+  .tutorials-title {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .sport-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  .sport-card {
+    background-color: #f0f0f0;
+    padding: 1.2rem;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: bold;
+    color: #333;
+    transition: background-color 0.2s ease;
+    border: 1px solid #ccc;
+  }
+  
+  .sport-card:hover {
+    background-color: #e0e0e0;
+  }
+  
