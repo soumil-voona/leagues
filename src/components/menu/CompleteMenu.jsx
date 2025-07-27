@@ -14,6 +14,7 @@ export default function CompleteMenu(props) {
                 <MenuItem content="Book A Match" location="/matches" />
                 <MenuItem content="Current Match Requests" location="/requests" />
                 <MenuItem content="Upcoming matches" location="/upcoming" />
+                <MenuItem content="Tutorials" location="/tutorials" />
             </div>
         </div>
     );

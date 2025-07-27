@@ -10,7 +10,7 @@ import { app } from "../firebaseConfig";
 import { Box, CircularProgress } from "@mui/material";
 
 export default function Homepage() {
-  const [userName, setUserName] = useState("User Name");
+  // const [userName, setUserName] = useState("User Name");
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);

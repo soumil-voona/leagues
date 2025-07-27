@@ -13,7 +13,7 @@ function SoccerTutorials() {
   return (
     <div className="sport-page">
       <button className="back-button" onClick={() => navigate(-1)}>← Back</button>
-      <h1 className="sport-title">Soccer Tutorials</h1>
+      <h1 className="sport-title title">Soccer Tutorials</h1>
       <div className="video-grid">
         {soccerVideos.map((video, index) => (
           <div key={index} className="video-card">

@@ -1,21 +1,20 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../../styles/SportTutorials.css';
 
-const badmintonVideos = [
-  { title: "Badminton Footwork Basics", url: "https://www.youtube.com/embed/url" },
-  { title: "Smash Like a Pro", url: "https://www.youtube.com/embed/url" },
+const tennisVideos = [
+  { title: "Tennis Footwork for Beginners", url: "https://www.youtube.com/embed" },
+  { title: "How to Hit a Forehand | Tennis Technique", url: "https://www.youtube.com/embed" },
 ];
 
-function BadmintonTutorials() {
+function TennisTutorials() {
   const navigate = useNavigate();
 
   return (
     <div className="sport-page">
       <button className="back-button" onClick={() => navigate(-1)}>← Back</button>
-      <h1 className="sport-title">Badminton Tutorials</h1>
+      <h1 className="sport-title title">Tennis Tutorials</h1>
       <div className="video-grid">
-        {badmintonVideos.map((video, index) => (
+        {tennisVideos.map((video, index) => (
           <div key={index} className="video-card">
             <h2 className="video-title">{video.title}</h2>
             <div className="video-wrapper">
@@ -32,4 +31,4 @@ function BadmintonTutorials() {
   );
 }
 
-export default BadmintonTutorials;
+export default TennisTutorials;

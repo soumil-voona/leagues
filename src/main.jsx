@@ -18,6 +18,14 @@ import Upcoming from './pages/Upcoming';
 import TeamDetailsPage from './pages/TeamDetailsPage';
 import Stats from './pages/Stats';
 
+// Tutorial Imports
+import TutorialsPage from './pages/TutorialsPage.jsx';
+import FootballTutorials from './pages/TutorialPages/FootballTutorials.jsx';
+import TennisTutorials from './pages/TutorialPages/TennisTutorials.jsx';
+import BasketballTutorials from './pages/TutorialPages/BasketballTutorials.jsx';
+import SoccerTutorials from './pages/TutorialPages/SoccerTutorials.jsx';
+import VolleyballTutorials from './pages/TutorialPages/VolleyballTutorials.jsx';
+
 // Component Imports
 import ProtectedRoute from './components/ProtectedRoute';
 import AuthRedirect from './components/AuthRedirect';
@@ -135,6 +143,60 @@ root.render(
           element={
             <ProtectedRoute>
               <Upcoming />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/tutorials"
+          element={
+            <ProtectedRoute>
+              <TutorialsPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/tutorials/basketball"
+          element={
+            <ProtectedRoute>
+              <BasketballTutorials />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/tutorials/football"
+          element={
+            <ProtectedRoute>
+              <FootballTutorials />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/tutorials/soccer"
+          element={
+            <ProtectedRoute>
+              <SoccerTutorials />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/tutorials/tennis"
+          element={
+            <ProtectedRoute>
+              <TennisTutorials />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/tutorials/volleyball"
+          element={
+            <ProtectedRoute>
+              <TennisTutorials />
             </ProtectedRoute>
           }
         />

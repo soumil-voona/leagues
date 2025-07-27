@@ -3,8 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import '../../styles/SportTutorials.css';
 
 const footballVideos = [
-  { title: "Football Training for Beginners", url: "https://www.youtube.com/embed/url" },
-  { title: "Quarterback Throwing Drills", url: "https://www.youtube.com/embed/url" },
+  {
+    title: "Football Training for Beginners",
+    url: "https://www.youtube.com/embed"
+  },
+  {
+    title: "Quarterback Throwing Drills",
+    url: "https://www.youtube.com/embed"
+  }
 ];
 
 function FootballTutorials() {
@@ -13,7 +19,7 @@ function FootballTutorials() {
   return (
     <div className="sport-page">
       <button className="back-button" onClick={() => navigate(-1)}>← Back</button>
-      <h1 className="sport-title">Football Tutorials</h1>
+      <h1 className="sport-title title">Football Tutorials</h1>
       <div className="video-grid">
         {footballVideos.map((video, index) => (
           <div key={index} className="video-card">
