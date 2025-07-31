@@ -1,6 +1,15 @@
 # 🏀 Leagues – A Social Sports Matchmaking Platform
 
-![Homepage Screenshot](image-1.png)
+![Homepage Screenshot](imgs/homepage.png)
+
+## ▶️ How to Run
+
+Make sure you have Node.js and npm installed.
+
+```bash
+npm install
+npm run dev
+```
 
 ## 🎯 Inspiration
 
@@ -72,4 +81,38 @@ We’ve noticed that people our age are getting less physical activity. Technolo
 
 ## 📸 Screenshots
 
-![Sign Up Page](image.png)
+Sign Up Page:
+![Sign Up Page](imgs/signUp.png)
+
+Login Page:
+![Login Page](imgs/login.png)
+
+Homepage:
+![Homepage Screenshot](imgs/homepage.png)
+
+Teams Page:
+![Teams Page](imgs/team.png)
+
+Stats Page:
+![Stats Page](imgs/stats.png)
+
+Book a Match Page:
+![Book a Match Page](imgs/bookAMatch.png)
+
+Current Match Requests Page:
+![Current Match Request Page](imgs/currentMatchRequests.png)
+
+Upcoming Matches Page:
+![Upcoming Matches Page](imgs/upcomingMatches.png)
+
+Tutorials Page:
+![Tutorials Page](imgs/tutorials.png)
+
+Settings Page:
+![Settings Page](imgs/settings.png)
+
+## 🪪 License
+
+© 2025 Leagues Team (Soumil Voona, Harshith Reddy Gade, Aarnav Munji, Iniyann Vivekanandan). All rights reserved.
+
+This project is proprietary and may not be copied, modified, or distributed without written permission from the team members.
