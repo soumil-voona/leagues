@@ -1,4 +1,4 @@
-# 🏀 Leagues – A Social Sports Matchmaking Platform
+# Leagues – A Social Sports Matchmaking Platform
 
 ![Homepage Screenshot](imgs/homepage.png)
 
@@ -11,15 +11,15 @@ npm install
 npm run dev
 ```
 
-## 🎯 Inspiration
+## Inspiration
 
 We’ve noticed that people our age are getting less physical activity. Technological entertainment is replacing the time usually spent on physical activity. This lack of movement can lead to serious health problems in the future. To fix this, we created **Leagues**.
 
-## 💡 What It Does
+## What It Does
 
 **Leagues** is a digital platform that encourages physical activity by enabling friendly matchmaking for sports teams. It prioritizes **fun over competition**, transforming sports into a tool for **social bonding and wellness**. Our skill-based matchmaking system ensures fair games, regardless of experience.
 
-## 🛠️ How We Built It
+## How We Built It
 
 - **Frontend**: React + Vite + Material UI (MUI)
 - **Backend**: Firebase (Firestore + Authentication)
@@ -27,31 +27,31 @@ We’ve noticed that people our age are getting less physical activity. Technolo
 - **Communication**: Git (code collaboration), WhatsApp (team coordination)
 - **Version Control**: GitHub
 
-## 🚧 Challenges We Ran Into
+## Challenges We Ran Into
 
 - Communication issues due to time zones and poor internet (some teammates were on vacation).
 - Debugging Firebase integration and UI responsiveness.
 - Managing teamwork with varied experience levels and schedules.
 
-## 🏆 Accomplishments We're Proud Of
+## Accomplishments We're Proud Of
 
 - Smooth Firebase integration with real-time updates.
 - Building a fully functional web app that could have real community impact.
 - Learning and applying modern tools like Vite and MUI efficiently.
 
-## 📚 What We Learned
+## What We Learned
 
 - How to scale projects according to our skillsets.
 - More in-depth experience with **React**, **Firebase**, and **OAuth**.
 - Broader understanding of how sports matchmaking platforms could work at scale.
 
-## 🚀 What's Next for Leagues
+## What's Next for Leagues
 
 - Leverage **AI** to provide personalized sports drills based on user match data.
 - Partner with local recreational centers to offer **safer** and more **accessible** play areas.
 - Expand to **multilingual support** to reach more global communities.
 
-## 🧱 Built With
+## Built With
 
 - [React](https://reactjs.org/) – MIT License
 - [Vite](https://vitejs.dev/) – MIT License
@@ -60,7 +60,7 @@ We’ve noticed that people our age are getting less physical activity. Technolo
 - [OAuth 2.0](https://oauth.net/2/) – Open Standard
 - HTML5, CSS3, JavaScript
 
-## 📝 Attributions & Credits
+## Attributions & Credits
 
 - **Fonts**:
   - [Montserrat (Italic Variable Font)](https://fonts.google.com/specimen/Montserrat) – Google Fonts, licensed under [Open Font License (OFL)](https://scripts.sil.org/OFL)
@@ -79,7 +79,7 @@ We’ve noticed that people our age are getting less physical activity. Technolo
 - **Design & Styling Tools**:
   - Adobe Fonts – Used under Adobe Creative Cloud license for typography
 
-## 📸 Screenshots
+## Screenshots
 
 **Sign Up Page**  
 ![Sign Up Page](imgs/signUp.png)
@@ -111,7 +111,7 @@ We’ve noticed that people our age are getting less physical activity. Technolo
 **Settings Page**  
 ![Settings Page](imgs/settings.png)
 
-## 🪪 License
+## License
 
 © 2025 Leagues Team (Soumil Voona, Harshith Reddy Gade, Aarnav Munji, Iniyann Vivekanandan). All rights reserved.
 
