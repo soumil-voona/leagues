@@ -81,34 +81,34 @@ We’ve noticed that people our age are getting less physical activity. Technolo
 
 ## 📸 Screenshots
 
-Sign Up Page:
+**Sign Up Page**  
 ![Sign Up Page](imgs/signUp.png)
 
-Login Page:
+**Login Page**  
 ![Login Page](imgs/login.png)
 
-Homepage:
+**Homepage**  
 ![Homepage Screenshot](imgs/homepage.png)
 
-Teams Page:
+**Teams Page**  
 ![Teams Page](imgs/team.png)
 
-Stats Page:
+**Stats Page**  
 ![Stats Page](imgs/stats.png)
 
-Book a Match Page:
+**Book a Match Page**  
 ![Book a Match Page](imgs/bookAMatch.png)
 
-Current Match Requests Page:
+**Current Match Requests Page**  
 ![Current Match Request Page](imgs/currentMatchRequests.png)
 
-Upcoming Matches Page:
+**Upcoming Matches Page**  
 ![Upcoming Matches Page](imgs/upcomingMatches.png)
 
-Tutorials Page:
+**Tutorials Page**  
 ![Tutorials Page](imgs/tutorials.png)
 
-Settings Page:
+**Settings Page**  
 ![Settings Page](imgs/settings.png)
 
 ## 🪪 License
