@@ -17,7 +17,7 @@ We’ve noticed that people our age are getting less physical activity. Technolo
 
 ## What It Does
 
-**Leagues** is a digital platform that encourages physical activity by enabling friendly matchmaking for sports teams. It prioritizes **fun over competition**, transforming sports into a tool for **social bonding and wellness**. Our skill-based matchmaking system ensures fair games, regardless of experience.
+**Leagues** is a digital platform that encourages physical activity by enabling friendly matchmaking for sports teams. It prioritizes **fun over competition**, transforming sports into a tool for **social bonding and wellness**. Our skill-based matchmaking system ensures fair games, regardless of experience. It also is **100% free and no commitment**, which removes the financial barrier in traditonal recreational leagues.
 
 ## How We Built It
 
