@@ -2,7 +2,7 @@
 
 ![Homepage Screenshot](imgs/homepage.png)
 
-## ▶️ How to Run
+## How to Run
 
 Make sure you have Node.js and npm installed.
 
