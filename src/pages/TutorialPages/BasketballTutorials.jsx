@@ -3,8 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import '../../styles/SportTutorials.css';
 
 const basketballVideos = [
-  { title: "Basketball Shooting Drills", url: "https://www.youtube.com/embed/url" },
-  { title: "How to Dribble Like a Pro", url: "https://www.youtube.com/embed/url" },
+  {
+    title: "Basketball Shooting Drills",
+    url: "https://www.youtube.com/embed", 
+  },
+  {
+    title: "How to Dribble Like a Pro",
+    url: "https://www.youtube.com/embed",
+  },
 ];
 
 function BasketballTutorials() {
